@@ -1,0 +1,71 @@
+/* src/styles/global.css */
+:root {
+  --color-primary:      #4F46E5;
+  --color-primary-dark: #3730A3;
+  --color-primary-light:#EEF2FF;
+  --color-danger:       #EF4444;
+  --color-danger-bg:    #FEF2F2;
+  --color-success:      #10B981;
+  --color-success-bg:   #ECFDF5;
+  --color-text:         #111827;
+  --color-text-muted:   #6B7280;
+  --color-border:       #E5E7EB;
+  --color-bg:           #F9FAFB;
+  --color-surface:      #FFFFFF;
+  --radius: 8px;
+  --shadow-md: 0 4px 12px rgba(0,0,0,.1);
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); background: var(--color-bg); color: var(--color-text); line-height: 1.5; }
+a { color: var(--color-primary); text-decoration: none; }
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+/* Auth layout */
+.auth-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; background: linear-gradient(135deg, var(--color-primary-light), #fff); }
+.auth-card { width: 100%; max-width: 440px; background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; }
+.auth-card__header { padding: 2rem 2rem 1.25rem; text-align: center; border-bottom: 1px solid var(--color-border); }
+.auth-logo { display: inline-flex; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+.auth-logo__text { font-size: 1.25rem; font-weight: 700; color: var(--color-primary); }
+.auth-card__title { font-size: 1.5rem; font-weight: 700; }
+.auth-card__subtitle { font-size: .875rem; color: var(--color-text-muted); margin-top: .25rem; }
+.auth-card__body { padding: 1.75rem 2rem 2rem; }
+.auth-footer { text-align: center; margin-top: 1.25rem; font-size: .875rem; color: var(--color-text-muted); }
+
+/* Form field */
+.form-field { display: flex; flex-direction: column; gap: .375rem; margin-bottom: 1rem; }
+.form-field__label { font-size: .875rem; font-weight: 500; }
+.form-field__input { width: 100%; padding: .625rem .875rem; border: 1px solid var(--color-border); border-radius: var(--radius); font-size: 1rem; font-family: inherit; }
+.form-field__input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(79,70,229,.15); outline: none; }
+.form-field--error .form-field__input { border-color: var(--color-danger); }
+.form-field__error { font-size: .8125rem; color: var(--color-danger); }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .625rem 1.25rem; border: 1px solid transparent; border-radius: var(--radius); font-size: 1rem; font-weight: 600; cursor: pointer; }
+.btn--primary { background: var(--color-primary); color: #fff; }
+.btn--primary:hover:not(:disabled) { background: var(--color-primary-dark); }
+.btn--full { width: 100%; margin-top: .5rem; }
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Alerts */
+.alert { padding: .75rem 1rem; border-radius: var(--radius); font-size: .875rem; margin-bottom: 1rem; }
+.alert--error { background: var(--color-danger-bg); color: var(--color-danger); border: 1px solid #FECACA; }
+
+/* Spinner */
+.spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; }
+.spinner--lg { width: 36px; height: 36px; border-width: 3px; border-top-color: var(--color-primary); border-color: var(--color-border); }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Loading page */
+.full-page-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 1rem; color: var(--color-text-muted); }
+
+/* Success banner */
+.success-banner { text-align: center; padding: 2rem; color: var(--color-success); }
+.success-icon { font-size: 3rem; display: block; margin-bottom: .75rem; }
+
+.link { color: var(--color-primary); font-weight: 500; }
+
+@media (max-width: 480px) {
+  .auth-card__body { padding: 1.25rem; }
+}
