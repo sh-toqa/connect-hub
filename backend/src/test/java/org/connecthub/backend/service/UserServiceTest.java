@@ -3,6 +3,7 @@ import org.connecthub.backend.dto.request.LoginRequest;
 import org.connecthub.backend.dto.request.RegisterRequest;
 import org.connecthub.backend.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -62,9 +63,8 @@ class UserServiceTest {
 
     }
 
-    // Test cases for UserService.register()
-    // Valid registration succeeds
     @Test
+    @DisplayName("Valid registration — saves user and returns DTO")
     void register_withValidData_savesUserAndReturnsDto() {
         // Arrange
         when(userRepository.existsByEmail("alice@example.com")).thenReturn(false);
@@ -92,8 +92,8 @@ class UserServiceTest {
         verify(passwordEncoder).encode("Secret123!");
     }
 
-    // Duplicate email — throws exception
     @Test
+    @DisplayName("Duplicate email — throws exception")
     void register_withDuplicateEmail_throwsEmailAlreadyExistsException() {
         // Arrange
         when(userRepository.existsByEmail("alice@example.com")).thenReturn(true);
@@ -106,8 +106,8 @@ class UserServiceTest {
         verify(userRepository, never()).save(any());   // nothing was saved
     }
 
-    // Password is NEVER stored in plain text
     @Test
+    @DisplayName("Password is hashed before storage")
     void register_passwordIsHashedBeforeStorage() {
         // Arrange
         when(userRepository.existsByEmail(any())).thenReturn(false);
@@ -125,9 +125,8 @@ class UserServiceTest {
         assertThat(savedUser.getHashedPassword()).doesNotContain("Secret123!");
     }
 
-    // Test cases for UserService.login()
-    // Correct credentials — returns JWT
     @Test
+    @DisplayName("Correct credentials — returns JWT")
     void login_withCorrectCredentials_returnsToken() {
         // Arrange
         User user = User.builder()
@@ -169,8 +168,8 @@ class UserServiceTest {
         assertThat(user.getStatus()).isEqualTo(UserStatus.ONLINE);
     }
 
-    // Wrong password — throws exception
     @Test
+    @DisplayName("Wrong password — throws exception")
     void login_withWrongPassword_throwsInvalidCredentialsException() {
         // Arrange
         User user = User.builder().hashedPassword("$2a$10$hashedpw").build();
@@ -186,8 +185,8 @@ class UserServiceTest {
                 .isInstanceOf(InvalidCredentialsException.class);
     }
 
-    // Non-existent email — throws exception (same error as wrong password — no info leak)
     @Test
+    @DisplayName("Non-existent email — throws InvalidCredentialsException")
     void login_withNonExistentEmail_throwsInvalidCredentialsException() {
         when(userRepository.findByEmail("ghost@example.com")).thenReturn(Optional.empty());
         LoginRequest request = new LoginRequest(
@@ -200,8 +199,8 @@ class UserServiceTest {
     }
 
     // Test cases for UserService.logout()
-    // Logout sets status to OFFLINE
     @Test
+    @DisplayName("Logout sets user status to OFFLINE")
     void logout_setsUserStatusToOffline() {
         // Arrange
         String email = "alice@example.com";
