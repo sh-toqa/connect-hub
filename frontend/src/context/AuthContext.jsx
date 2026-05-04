@@ -1,66 +1,63 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { loginUser, logoutUser, getMe } from '../api/authApi';
+import { createContext, useContext, useState, useCallback } from 'react';
+import { loginUser as loginApi, logoutUser as logoutApi } from '../api/authApi';
 
-// AuthContext provides authentication state and functions to the app.
 const AuthContext = createContext(null);
 
-// Auth state is managed here and provided to the rest of the app via AuthProvider.
 export function AuthProvider({ children }) {
-  // null  = not authenticated
-  // {...} = authenticated user object (UserDto shape)
-  // saves the logged-in user's info, or null if not logged in
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem('user');
+      return stored ? JSON.parse(stored) : null;
+    } catch { return null; }
+  });
 
-  // check if user info is being loaded
-  const [loading, setLoading] = useState(true);
+  const login = useCallback(async ({ email, password }) => {
+    const { data } = await loginApi({ email, password });
 
-  // On mount, try to restore the session.
-  // This succeeds only if a token was already set in tokenStore
-  useEffect(() => {
-    getMe()
-      .then((me) => setUser(me))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
+    // Log the raw response so we can see the exact shape
+    console.log('Raw login response:', data);
+
+    // Handle both response shapes:
+    const token = data.token;
+    const user  = data.user ?? {
+      userId:          data.userId,
+      username:        data.username,
+      email:           data.email,
+      bio:             data.bio,
+      profilePhotoPath: data.profilePhotoPath,
+      coverPhotoPath:  data.coverPhotoPath,
+      status:          data.status,
+    };
+
+    console.log('Parsed user:', user);
+
+    sessionStorage.setItem('token', token);
+    sessionStorage.setItem('user', JSON.stringify(user));
+    setUser(user);
+    return user;
   }, []);
 
-  /**
-   * login() — calls the API, stores the token, updates React state.
-   * Components call this; they never touch tokenStore directly.
-   *
-   * @param {{ email, password }} credentials
-   * @returns {Promise<UserDto>} the logged-in user
-   */
-  const login = useCallback(async (credentials) => {
-    const { user: loggedInUser } = await loginUser(credentials);
-    setUser(loggedInUser);
-    return loggedInUser;
-  }, []);
-
-  /**
-   * logout() — calls the API (sets OFFLINE), wipes the token, clears state.
-   */
   const logout = useCallback(async () => {
-    await logoutUser();
+    try { await logoutApi(); } catch { /* best-effort */ }
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     setUser(null);
   }, []);
 
-  const value = { user, loading, login, logout, setUser };
+  const refreshUser = useCallback((updatedUser) => {
+    sessionStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  }, []);
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, login, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-/**
- * useAuth() — consume the auth context from any child component.
- * Throws a clear error if used outside <AuthProvider>.
- */
-export function useAuth() {
+export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error('useAuth() must be used inside <AuthProvider>');
-  }
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
   return ctx;
-}
+};
