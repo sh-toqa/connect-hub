@@ -1,16 +1,16 @@
 package org.connecthub.backend.security;
 import lombok.RequiredArgsConstructor;
+import org.connecthub.backend.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -39,7 +39,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthFilter  jwtAuthFilter;
-    private final UserRepository userRepository;
+    private final CustomUserDetailsService userDetailsService;
 
     @Value("${app.cors.allowed-origin}")
     private String allowedOrigin;
@@ -77,18 +77,7 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // UserDetailsService that loads user details from the database based on email, used for authentication and JWT validation
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return email -> userRepository.findByEmail(email)
-                .map(user -> org.springframework.security.core.userdetails.User
-                        .withUsername(user.getEmail())
-                        .password(user.getHashedPassword())
-                        .roles("USER")
-                        .build())
-                .orElseThrow(() -> new UsernameNotFoundException(
-                        "No account found with email: " + email));
-    }
+
 
     // CORS configuration to allow requests from the React frontend and specify allowed methods and headers
     @Bean
