@@ -6,6 +6,7 @@ import EditProfileModal     from '../components/profile/EditProfileModal';
 import PostCard             from '../components/profile/PostCard';
 import FriendsList          from '../components/profile/FriendsList';
 import { useAuth }          from '../context/AuthContext';
+import '../styles/profile.css';
 
 export default function ProfilePage() {
   const { user }  = useAuth();
