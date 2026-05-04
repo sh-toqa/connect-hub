@@ -1,9 +1,7 @@
 package org.connecthub.backend.exception;
 
-import org.connecthub.backend.exception.EmailAlreadyExistsException;
-import org.connecthub.backend.exception.InvalidCredentialsException;
+import org.connecthub.backend.dto.response.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,79 +14,74 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Global exception handler for the ConnectHub backend application.
- * This class uses @RestControllerAdvice to intercept exceptions thrown by controllers and services,
- * and returns consistent HTTP responses with appropriate status codes and error messages.
- *
- * It handles specific exceptions like MethodArgumentNotValidException for validation errors,
- * EmailAlreadyExistsException for registration conflicts, and InvalidCredentialsException for authentication failures.
- * It also includes a catch-all handler for any unhandled exceptions, which logs the error and returns a generic 500 response.
- *
- * Each handler method constructs a response body containing the status code, error type, message, timestamp, and request path,
- * ensuring that clients receive clear and consistent error information.
+ * Central exception handler. Every unhandled exception ends up here
+ * and is returned as a structured JSON ApiErrorResponse — never a raw stack trace.
  */
-
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 400 Bad Request — validation errors from @Valid in controllers
+    // ── Validation failures (400) ─────────────────────────────────────────────
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request) {
+    public ResponseEntity<ApiErrorResponse> handleValidation(
+            MethodArgumentNotValidException ex, HttpServletRequest req) {
 
-        String message = ex.getBindingResult().getFieldErrors().stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining("; "));
+        Map<String, String> fieldErrors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fe -> fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Invalid value",
+                        (a, b) -> a   // keep first message if field appears twice
+                ));
 
-        return build(HttpStatus.BAD_REQUEST, "Validation failed", message, request);
+        return ResponseEntity.badRequest().body(new ApiErrorResponse(
+                LocalDateTime.now(), 400, "Validation Failed",
+                "One or more fields are invalid", req.getRequestURI(), fieldErrors));
     }
 
-    // 409 Conflict — email or username already exists during registration
+    // ── Business rule violations (409) ───────────────────────────────────────
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<Map<String, Object>> handleDuplicate(
-            EmailAlreadyExistsException ex,
-            HttpServletRequest request) {
-
-        return build(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), request);
+    public ResponseEntity<ApiErrorResponse> handleEmailExists(
+            EmailAlreadyExistsException ex, HttpServletRequest req) {
+        return conflict(ex.getMessage(), req);
     }
 
-    // 401 Unauthorized — invalid login credentials
-    @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<Map<String, Object>> handleBadCredentials(
-            InvalidCredentialsException ex,
-            HttpServletRequest request) {
-
-        return build(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage(), request);
+    // ── Authentication failures (401) ────────────────────────────────────────
+    @ExceptionHandler({InvalidCredentialsException.class, InvalidPasswordException.class})
+    public ResponseEntity<ApiErrorResponse> handleAuth(
+            RuntimeException ex, HttpServletRequest req) {
+        return build(HttpStatus.UNAUTHORIZED, "Unauthorized", ex.getMessage(), req);
     }
 
-    // 500 Internal Server Error — catch-all for any unhandled exceptions, with logging
+    // ── Not found (404) ──────────────────────────────────────────────────────
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleNotFound(
+            ResourceNotFoundException ex, HttpServletRequest req) {
+        return build(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage(), req);
+    }
+
+    // ── File storage failures (500) ───────────────────────────────────────────
+    @ExceptionHandler(FileStorageException.class)
+    public ResponseEntity<ApiErrorResponse> handleFileStorage(
+            FileStorageException ex, HttpServletRequest req) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "File Storage Error", ex.getMessage(), req);
+    }
+
+    // ── Catch-all (500) ───────────────────────────────────────────────────────
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGeneric(
-            Exception ex,
-            HttpServletRequest request) {
-
-        log.error("Unhandled exception at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
-        return build(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "Internal Server Error",
-                "An unexpected error occurred. Please try again later.",
-                request
-        );
+    public ResponseEntity<ApiErrorResponse> handleAll(Exception ex, HttpServletRequest req) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
+                "An unexpected error occurred", req);
     }
 
-    // Helper method to build a consistent error response body with status, error, message, timestamp, and path
-    private ResponseEntity<Map<String, Object>> build(
-            HttpStatus status, String error, String message, HttpServletRequest request) {
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    private ResponseEntity<ApiErrorResponse> conflict(String message, HttpServletRequest req) {
+        return build(HttpStatus.CONFLICT, "Conflict", message, req);
+    }
 
-        Map<String, Object> body = Map.of(
-                "status",    status.value(),
-                "error",     error,
-                "message",   message,
-                "timestamp", LocalDateTime.now().toString(),
-                "path",      request.getRequestURI()
-        );
-        return ResponseEntity.status(status).body(body);
+    private ResponseEntity<ApiErrorResponse> build(
+            HttpStatus status, String error, String message, HttpServletRequest req) {
+        return ResponseEntity.status(status).body(new ApiErrorResponse(
+                LocalDateTime.now(), status.value(), error, message, req.getRequestURI(), null));
     }
 }
