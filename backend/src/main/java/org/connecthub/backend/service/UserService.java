@@ -87,7 +87,7 @@ public class UserService {
         return new LoginResponse(token, userDto);
     }
 
-    // Invalidate the user's token (logout) ********************
+    // Invalidate the user's token (logout)
     @Transactional
     public void logout(String email) {
 
