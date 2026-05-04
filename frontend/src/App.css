@@ -1,184 +1,152 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
+/* ── Reset & base ────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f0f2f5;
+  color: #1c1e21;
+  min-height: 100vh;
 }
 
-.hero {
-  position: relative;
+/* ── App shell ───────────────────────────────────────────────────────────── */
+.app-shell    { display: flex; flex-direction: column; min-height: 100vh; }
+.page-content { flex: 1; padding-top: 60px; /* offset fixed navbar */ }
 
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+/* ── Navbar ──────────────────────────────────────────────────────────────── */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 60px;
+  background: #fff;
+  border-bottom: 1px solid #e4e6eb;
+  display: flex; align-items: center;
+  padding: 0 20px; gap: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
 }
 
-#center {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
+.navbar-brand {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 20px; font-weight: 800;
+  color: #1877f2; text-decoration: none;
+  flex-shrink: 0;
+}
+.brand-icon { font-size: 22px; }
 
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+.navbar-links {
+  display: flex; gap: 4px; flex: 1; justify-content: center;
+}
+.nav-link {
+  padding: 8px 18px; border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px; font-weight: 500; color: #65676b;
+  transition: background 0.15s, color 0.15s;
+}
+.nav-link:hover  { background: #f0f2f5; color: #1c1e21; }
+.nav-link.active { background: #e7f0fd; color: #1877f2; font-weight: 700; }
+
+.navbar-user {
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+.navbar-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #e4e6eb; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #65676b;
+  flex-shrink: 0;
+}
+.navbar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.navbar-username { font-size: 14px; font-weight: 600; }
+
+.logout-btn {
+  background: #e4e6eb; border: none; border-radius: 8px;
+  padding: 7px 14px; font-size: 13px; font-weight: 600;
+  cursor: pointer; color: #1c1e21;
+  transition: background 0.15s;
+}
+.logout-btn:hover { background: #d8dadf; }
+
+@media (max-width: 600px) {
+  .navbar-username { display: none; }
+  .navbar-links    { gap: 0; }
+  .nav-link        { padding: 8px 10px; font-size: 13px; }
 }
 
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+/* ── Auth pages ──────────────────────────────────────────────────────────── */
+.auth-page {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #1877f2 0%, #42b72a 100%);
+  padding: 20px;
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
+.auth-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px 36px;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
 }
 
-#next-steps ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
+.auth-brand {
+  text-align: center; margin-bottom: 28px;
 }
+.auth-brand .brand-icon { font-size: 36px; }
+.auth-brand h1 { font-size: 26px; font-weight: 800; color: #1877f2; margin: 4px 0; }
+.auth-brand p  { color: #65676b; font-size: 14px; }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+
+.auth-footer {
+  text-align: center; margin-top: 20px;
+  font-size: 14px; color: #65676b;
 }
+.auth-footer a { color: #1877f2; font-weight: 600; text-decoration: none; }
+.auth-footer a:hover { text-decoration: underline; }
 
-.ticks {
-  position: relative;
-  width: 100%;
+/* ── Shared form styles ──────────────────────────────────────────────────── */
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 13px; font-weight: 600; color: #333; }
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
-
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+.form-group input {
+  width: 100%; padding: 11px 14px;
+  border: 1.5px solid #e4e6eb; border-radius: 8px;
+  font-size: 14px; background: #f8f9fa;
+  transition: border-color 0.15s, background 0.15s;
 }
+.form-group input:focus {
+  outline: none; border-color: #1877f2; background: #fff;
+}
+.form-group input.input-error { border-color: #d93025; }
+
+.field-error { color: #d93025; font-size: 12px; }
+.form-error  { color: #d93025; font-size: 13px; margin: 2px 0; }
+.form-success{ color: #34a853; font-size: 13px; margin: 2px 0; }
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn-primary {
+  background: #1877f2; color: #fff;
+  border: none; border-radius: 8px;
+  padding: 10px 20px; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-primary:hover    { background: #145dbf; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary.btn-full { width: 100%; padding: 13px; font-size: 15px; }
+
+.btn-secondary {
+  background: #e4e6eb; color: #1c1e21;
+  border: none; border-radius: 8px;
+  padding: 10px 20px; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background 0.15s;
+}
+.btn-secondary:hover { background: #d8dadf; }
+
+/* ── Placeholder pages ───────────────────────────────────────────────────── */
+.placeholder-page {
+  max-width: 600px; margin: 60px auto; text-align: center;
+  padding: 40px 20px;
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+}
+.placeholder-page h2 { font-size: 24px; margin-bottom: 12px; }
+.placeholder-page p  { color: #65676b; font-size: 15px; }
