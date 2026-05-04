@@ -53,12 +53,16 @@ public class SecurityConfig {
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/register",
-                                "/auth/login"
-
-                        ).permitAll() // public endpoints for registration and login
-                        .anyRequest().authenticated() // all other endpoints require authentication
+                        // Public endpoints
+                        .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        // Static file serving for uploaded images
+                        .requestMatchers("/uploads/**").permitAll()
+                        // Actuator health check
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/profile/**").authenticated()
+                        // Everything else requires a valid JWT
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); // add JWT filter before the default username/password filter
 
