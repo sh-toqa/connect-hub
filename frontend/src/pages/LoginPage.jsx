@@ -1,22 +1,18 @@
 import { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoginForm from '../components/LoginForm';
 
 export default function LoginPage() {
-  const { login }  = useAuth();
-  const navigate   = useNavigate();
-  const location   = useLocation();
-
-  const from = location.state?.from?.pathname || '/';
-
+  const { login } = useAuth();
   const [serverError, setServerError] = useState('');
 
   const handleSubmit = async (credentials) => {
     setServerError('');
     try {
-      await login(credentials); // AuthContext.login → authApi.loginUser
-      navigate(from, { replace: true });
+      await login(credentials);
+      // No navigate() here — GuestRoute detects user is now set
+      // and redirects to /feed automatically
     } catch {
       setServerError('Invalid email or password. Please try again.');
     }
@@ -37,7 +33,6 @@ export default function LoginPage() {
 
         <div className="auth-card__body">
           <LoginForm onSubmit={handleSubmit} serverError={serverError} />
-
           <p className="auth-footer">
             Don't have an account?{' '}
             <Link to="/signup" className="link">Sign up</Link>
