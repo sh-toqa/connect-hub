@@ -22,6 +22,12 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
             UUID authorId, ContentType contentType, Pageable pageable);
     // Newsfeed: posts from a list of friend IDs, newest first, paginated.
     // Excludes content from blocked users (handled in service layer via friendIds list).
+
+
+    List<Content> findByAuthor_UserIdAndContentTypeOrderByTimestampDesc(
+            UUID authorId,
+            ContentType contentType
+    );
     
     @Query("""
         SELECT c FROM Content c
@@ -38,4 +44,5 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
     @Modifying
     @Query("DELETE FROM Content c WHERE c.contentType = 'STORY' AND c.timestamp < :expiryTime")
     int deleteExpiredStories(@Param("expiryTime") LocalDateTime expiryTime);
+
 }
