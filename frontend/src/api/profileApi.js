@@ -6,6 +6,7 @@ export const updateProfile     = (data)          => api.patch('/profile', data);
 export const updatePassword    = (data)          => api.patch('/profile/password', data);
 export const getMyPosts        = (page=0, size=10) => api.get('/profile/posts', { params: { page, size } });
 export const getMyFriends      = ()              => api.get('/profile/friends');
+export const getMyStories      = ()              => api.get('/profile/stories');
 
 export const uploadProfilePhoto = (file) => {
   const form = new FormData();
@@ -22,3 +23,9 @@ export const uploadCoverPhoto = (file) => {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 };
+
+export const getUserPosts = (userId, page = 0, size = 20) =>
+  api.get(`/profile/${userId}/posts`, { params: { page, size } });
+
+export const getUserStories = (userId, page = 0, size = 20) =>
+  api.get(`/profile/${userId}/stories`, { params: { page, size } });
