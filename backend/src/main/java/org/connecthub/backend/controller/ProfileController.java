@@ -121,4 +121,26 @@ public class ProfileController {
     private UUID extractUserId(UserDetails userDetails) {
         return UUID.fromString(userDetails.getUsername());
     }
+
+    @GetMapping("/{userId}/posts")
+    public ResponseEntity<Page<ContentDto>> getUserPosts(
+            @PathVariable UUID userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return ResponseEntity.ok(
+                profileService.getOwnPosts(userId, page, size)
+        );
+    }
+
+    @GetMapping("/{userId}/stories")
+    public ResponseEntity<Page<ContentDto>> getUserStories(
+            @PathVariable UUID userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        return ResponseEntity.ok(
+                profileService.getOwnStories(userId, page, size)
+        );
+    }
 }
