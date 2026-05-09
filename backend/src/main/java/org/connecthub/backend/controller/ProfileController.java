@@ -100,6 +100,15 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.getOwnPosts(userId, page, size));
     }
 
+    @GetMapping("/stories")
+    public ResponseEntity<Page<ContentDto>> getMyStories(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(defaultValue = "0")  int page,
+            @RequestParam(defaultValue = "50") int size) {
+        UUID userId = extractUserId(userDetails);
+        return ResponseEntity.ok(profileService.getOwnStories(userId, page, size));
+    }
+
     // Get friends list with status
     @GetMapping("/friends")
     public ResponseEntity<List<UserDto>> getMyFriends(
