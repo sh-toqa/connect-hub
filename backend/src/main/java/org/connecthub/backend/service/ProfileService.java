@@ -120,6 +120,15 @@ public class ProfileService {
                 .map(userMapper::toContentDto);
     }
 
+    public Page<ContentDto> getOwnStories(UUID userId, int page, int size) {
+        findUserOrThrow(userId);
+        PageRequest pageable = PageRequest.of(page, size, Sort.by("timestamp").descending());
+        return contentRepository
+                .findByAuthor_UserIdAndContentTypeOrderByTimestampDesc(
+                        userId, ContentType.STORY, pageable)
+                .map(userMapper::toContentDto);
+    }
+
     // View friends list with status
     public List<UserDto> getFriends(UUID userId) {
         findUserOrThrow(userId);
