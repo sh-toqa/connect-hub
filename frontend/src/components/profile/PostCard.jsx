@@ -1,31 +1,52 @@
-// src/components/profile/PostCard.jsx
-// Renders one post entry — used by the posts grid on the profile page.
+import { useAuth } from '../../context/AuthContext';
 
-function timeAgo(isoString) {
-  const diff = Date.now() - new Date(isoString).getTime();
-  const mins  = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days  = Math.floor(diff / 86400000);
-  if (mins  < 1)  return 'just now';
-  if (mins  < 60) return `${mins}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return `${days}d ago`;
-}
+export default function PostCard({ post, onDelete, onClick }) {
+  const { user } = useAuth();
+  const { author, contentText, imagePath, timestamp, contentId } = post;
 
-export default function PostCard({ post }) {
+  const avatarSrc    = author?.profilePhotoPath
+    ? `http://localhost:8080${author.profilePhotoPath}`
+    : null;
+  const initials     = author?.username?.slice(0, 2).toUpperCase() || '??';
+  const formattedDate = new Date(timestamp).toLocaleString();
+  const isOwner      = user?.userId === author?.userId;
+
   return (
-    <article className="post-card">
-      {post.imagePath && (
-        <div className="post-card__image-wrap">
-          <img src={post.imagePath} alt="Post attachment" className="post-card__image" loading="lazy" />
+    <article
+      className="post-card"
+      onClick={onClick ? () => onClick(post) : undefined}
+      style={{ cursor: onClick ? 'pointer' : 'default' }}
+    >
+      <header className="post-header">
+        <div className="post-avatar">
+          {avatarSrc
+            ? <img src={avatarSrc} alt={author?.username} />
+            : <span>{initials}</span>}
         </div>
+        <div className="post-meta">
+          <span className="post-username">{author?.username}</span>
+          <time className="post-time" dateTime={timestamp}>{formattedDate}</time>
+        </div>
+        {isOwner && onDelete && (
+          <button
+            className="post-delete-btn"
+            onClick={(e) => { e.stopPropagation(); onDelete(contentId); }}
+            aria-label="Delete post"
+          >
+            🗑
+          </button>
+        )}
+      </header>
+
+      {contentText && <p className="post-text">{contentText}</p>}
+
+      {imagePath && (
+        <img
+          src={`http://localhost:8080${imagePath}`}
+          alt="Post attachment"
+          className="post-image"
+        />
       )}
-      <div className="post-card__body">
-        <p className="post-card__text">{post.contentText}</p>
-        <time className="post-card__time" dateTime={post.timestamp}>
-          {timeAgo(post.timestamp)}
-        </time>
-      </div>
     </article>
   );
 }
