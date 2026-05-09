@@ -57,7 +57,9 @@ public class SecurityConfig {
                         .requestMatchers("/uploads/**").permitAll()
                         // Actuator health check
                         .requestMatchers("/actuator/health").permitAll()
+                        // Protected endpoints
                         .requestMatchers("/profile/**").authenticated()
+                        .requestMatchers("/content/**").authenticated()
                         // Everything else requires a valid JWT
                         .anyRequest().authenticated()
                 )
