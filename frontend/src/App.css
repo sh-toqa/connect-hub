@@ -150,3 +150,207 @@ body {
 }
 .placeholder-page h2 { font-size: 24px; margin-bottom: 12px; }
 .placeholder-page p  { color: #65676b; font-size: 15px; }
+
+
+/* ── Newsfeed page ────────────────────────────────────────────────────────── */
+.newsfeed-page {
+  max-width: 680px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.feed-header h2 { font-size: 18px; font-weight: 700; }
+
+.refresh-btn {
+  background: none;
+  border: 1px solid #e4e6eb;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #65676b;
+  transition: background 0.15s;
+}
+.refresh-btn:hover { background: #f0f2f5; }
+
+.feed-loading, .feed-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 0;
+  color: #65676b;
+}
+.feed-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: #65676b;
+  font-size: 15px;
+}
+
+.load-more-feed-btn {
+  width: 100%;
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+/* ── Post delete button ───────────────────────────────────────────────────── */
+.post-delete-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #65676b;
+  transition: background 0.15s;
+}
+.post-delete-btn:hover { background: #ffebe8; color: #d93025; }
+
+
+/* ── Content Modal ────────────────────────────────────────────────────────── */
+.content-modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.content-modal-box {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0,0,0,.3);
+}
+
+.story-modal {
+  max-width: 420px;
+}
+
+.content-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid #e4e6eb;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1;
+}
+
+.content-modal-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.content-modal-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: #e4e6eb;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: #65676b;
+  flex-shrink: 0;
+}
+.content-modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.content-modal-username {
+  display: block;
+  font-weight: 700;
+  font-size: 15px;
+}
+.content-modal-time {
+  display: block;
+  font-size: 12px;
+  color: #65676b;
+  margin-top: 1px;
+}
+.content-modal-badge {
+  display: inline-block;
+  font-size: 11px;
+  background: #fff3cd;
+  color: #856404;
+  border-radius: 99px;
+  padding: 2px 8px;
+  margin-top: 3px;
+  font-weight: 600;
+}
+
+.content-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal-delete-btn {
+  background: none;
+  border: 1px solid #e4e6eb;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #d93025;
+  transition: background 0.15s;
+}
+.modal-delete-btn:hover { background: #ffebe8; }
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #65676b;
+  padding: 4px 8px;
+  border-radius: 8px;
+  line-height: 1;
+}
+.modal-close-btn:hover { background: #f0f2f5; }
+
+.content-modal-image {
+  width: 100%;
+}
+.content-modal-image img {
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+  display: block;
+}
+
+.content-modal-text {
+  padding: 16px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #1c1e21;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* Make story bubble a proper button */
+.story-bubble {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.story-bubble:focus-visible {
+  outline: 2px solid #1877f2;
+  border-radius: 8px;
+}
