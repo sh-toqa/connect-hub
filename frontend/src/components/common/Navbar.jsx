@@ -26,7 +26,7 @@ export default function Navbar() {
         <NavLink to="/feed"    className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
           🏠 Home
         </NavLink>
-        <NavLink to="/profile" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+        <NavLink to="/profile" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
           👤 Profile
         </NavLink>
         <NavLink to="/friends" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
