@@ -25,10 +25,8 @@ export default function EditProfileModal({ profile, onSaveBio, onSaveProfilePhot
   const profileInputRef = useRef();
   const coverInputRef   = useRef();
 
-  // ── Shared reset ─────────────────────────────────────────────────────────
   const clearMessages = () => { setSuccessMsg(''); setServerError(''); };
 
-  // ── Tab: Profile ─────────────────────────────────────────────────────────
   const handlePhotoChange = (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -53,7 +51,6 @@ export default function EditProfileModal({ profile, onSaveBio, onSaveProfilePhot
     } finally { setSaving(false); }
   };
 
-  // ── Tab: Cover Photo ─────────────────────────────────────────────────────
   const handleSaveCover = async () => {
     if (!coverFile) return;
     setSaving(true);
@@ -67,7 +64,6 @@ export default function EditProfileModal({ profile, onSaveBio, onSaveProfilePhot
     } finally { setSaving(false); }
   };
 
-  // ── Tab: Password ─────────────────────────────────────────────────────────
   const validatePassword = () => {
     const errs = {};
     if (!pwForm.current)         errs.current = 'Current password is required';
@@ -118,14 +114,14 @@ export default function EditProfileModal({ profile, onSaveBio, onSaveProfilePhot
         {successMsg  && <div className="alert alert--success" role="status">{successMsg}</div>}
         {serverError && <div className="alert alert--error"   role="alert">{serverError}</div>}
 
-        {/* ── Tab: Profile ───────────────────────────────────────────────── */}
+        {/* Profile tab content */}
         {activeTab === 'Profile' && (
           <div className="modal__body">
             {/* Profile photo upload with preview — FR-PM-10 */}
             <div className="upload-row">
               <div className="upload-preview upload-preview--round">
                 <img
-                  src={photoPreview || profile?.profilePhotoPath || '/default-avatar.png'}
+                  src={photoPreview || profile?.profilePhotoPath || 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original'}
                   alt="Profile photo preview"
                 />
                 <button
@@ -173,7 +169,7 @@ export default function EditProfileModal({ profile, onSaveBio, onSaveProfilePhot
           </div>
         )}
 
-        {/* ── Tab: Cover Photo ───────────────────────────────────────────── */}
+        {/* Cover Photo tab content */}
         {activeTab === 'Cover Photo' && (
           <div className="modal__body">
             {/* Cover preview — FR-PM-10 */}
@@ -203,7 +199,7 @@ export default function EditProfileModal({ profile, onSaveBio, onSaveProfilePhot
           </div>
         )}
 
-        {/* ── Tab: Password ──────────────────────────────────────────────── */}
+        {/* Password tab content */}
         {activeTab === 'Password' && (
           <div className="modal__body">
             {[
