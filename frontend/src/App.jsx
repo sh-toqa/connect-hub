@@ -6,9 +6,9 @@ import SignupPage    from './pages/SignupPage';
 import ProfilePage   from './pages/ProfilePage';
 import NewsfeedPage  from './pages/NewsfeedPage';
 import FriendsPage   from './pages/FriendsPage';
+import UserProfilePage from './pages/UserProfilePage';
 import NotFoundPage  from './pages/NotFoundPage';
 import './styles/global.css'
-import './styles/profile.css';
 import './App.css';
 
 function PrivateRoutes() {
@@ -36,7 +36,9 @@ function AppRoutes() {
       <Route element={<PrivateRoutes />}>
         <Route path="/feed"    element={<NewsfeedPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/friends" element={<FriendsPage />} />
+        <Route path="/friends"        element={<FriendsPage />} />
+        <Route path="/profile/:userId/posts" element={<UserProfilePage />} />
+        <Route path="/profile/:userId/stories" element={<UserProfilePage />} />
       </Route>
 
       <Route path="/"  element={<Navigate to="/feed" replace />} />
