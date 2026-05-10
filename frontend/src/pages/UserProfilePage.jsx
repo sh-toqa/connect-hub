@@ -1,24 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getUserProfile }  from '../api/profileApi';
-import { getUserPosts }    from '../api/profileApi';
-import { getUserStories }  from '../api/profileApi';
-import PostCard            from '../components/profile/PostCard';
-import StoryStrip           from '../components/content/StoryStrip';
-import ContentModal        from '../components/content/ContentModal';
+
+import { getUserProfile, getUserPosts } from '../api/profileApi';
+import { getFriendStatus, sendRequest } from '../api/friendApi';
+
+import CoverPhoto from '../components/profile/CoverPhoto';
+import ProfileAvatar from '../components/profile/ProfileAvatar';
+import PostCard from '../components/profile/PostCard';
+import ContentModal from '../components/content/ContentModal';
+
 import '../components/profile/profile.css';
 import '../components/content/content.css';
 
 export default function UserProfilePage() {
-  const { userId }   = useParams();
-  const navigate     = useNavigate();
+  const { userId } = useParams();
+  const navigate = useNavigate();
 
-  const [profile,  setProfile]  = useState(null);
-  const [posts,    setPosts]    = useState([]);
-  const [stories,  setStories]  = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [selectedContent, setSelectedContent] = useState(null);
+  const [friendStatus, setFriendStatus] = useState('NONE');
 
   useEffect(() => {
     const load = async () => {
@@ -26,21 +30,31 @@ export default function UserProfilePage() {
         setLoading(true);
         setError(null);
 
-        const [profileRes, postsRes, storiesRes] = await Promise.all([
+        const [profileRes, postsRes] = await Promise.all([
           getUserProfile(userId),
-          getUserPosts(userId).catch(() => ({ data: { content: [] } })),
-          getUserStories(userId).catch(() => ({ data: { content: [] } }))
+          getUserPosts(userId).catch(() => ({
+            data: { content: [] }
+          }))
         ]);
 
         setProfile(profileRes.data);
         setPosts(postsRes.data.content ?? []);
-        setStories(storiesRes.data.content ?? []);
+
+        const statusRes = await getFriendStatus(userId).catch(() => ({
+          data: { status: 'NONE' }
+        }));
+
+        setFriendStatus(statusRes.data.status);
+
       } catch (err) {
-        setError(err.response?.data?.message || 'User not found');
+        setError(
+          err.response?.data?.message || 'User not found'
+        );
       } finally {
         setLoading(false);
       }
     };
+
     load();
   }, [userId]);
 
@@ -57,79 +71,135 @@ export default function UserProfilePage() {
     return (
       <div className="profile-error" role="alert">
         <p>⚠ {error}</p>
-        <button className="btn-secondary" onClick={() => navigate(-1)}>Go back</button>
+
+        <button
+          className="btn-secondary"
+          onClick={() => navigate(-1)}
+        >
+          Go Back
+        </button>
       </div>
     );
   }
 
-  const avatarSrc = profile?.profilePhotoPath
-    ? `http://localhost:8080${profile.profilePhotoPath}`
-    : null;
-  const coverSrc  = profile?.coverPhotoPath
-    ? `http://localhost:8080${profile.coverPhotoPath}`
-    : null;
-  const initials  = profile?.username?.slice(0, 2).toUpperCase() || '??';
-  const isOnline  = profile?.status === 'ONLINE';
+  const isOnline = profile?.status === 'ONLINE';
 
   return (
     <main className="profile-page">
 
       {/* Cover photo */}
-      <div className="cover-photo-container">
-        {coverSrc
-          ? <img src={coverSrc} alt="Cover" className="cover-photo-img" />
-          : <div className="cover-photo-placeholder" />}
-      </div>
+      <CoverPhoto
+        src={profile?.coverPhotoPath}
+      />
 
       {/* Profile header */}
       <section className="profile-header">
 
-        <div className="profile-avatar">
-          <div className="avatar-circle">
-            {avatarSrc
-              ? <img src={avatarSrc} alt={profile?.username} className="avatar-img" />
-              : <span className="avatar-initials">{initials}</span>}
-          </div>
-
-          <span
-            className={`status-dot ${isOnline ? 'online' : 'offline'}`}
-            title={isOnline ? 'Online' : 'Offline'}
-          />
-        </div>
+        <ProfileAvatar
+          src={profile?.profilePhotoPath}
+          username={profile?.username}
+        />
 
         <div className="profile-info">
-          <h1 className="profile-username">{profile?.username}</h1>
+
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
+            }}
+          >
+            <h1 className="profile-username">
+              {profile?.username}
+            </h1>
+
+            <span
+              className={`status-dot ${
+                isOnline ? 'online' : 'offline'
+              }`}
+              title={isOnline ? 'Online' : 'Offline'}
+              style={{
+                position: 'static',
+                width: 10,
+                height: 10,
+                flexShrink: 0
+              }}
+            />
+          </div>
 
           <p className="profile-email">
             {profile?.email}
           </p>
 
-          {profile?.bio
-            ? <p className="profile-bio">{profile.bio}</p>
-            : <p className="profile-bio empty">No bio yet.</p>}
+          {profile?.bio ? (
+            <p className="profile-bio">
+              {profile.bio}
+            </p>
+          ) : (
+            <p className="profile-bio empty">
+              No bio yet.
+            </p>
+          )}
         </div>
 
-        <button
-          className="btn-primary edit-profile-btn"
-          onClick={() => navigate(-1)}
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            marginLeft: 'auto'
+          }}
         >
-          ← Back
-        </button>
 
+          {friendStatus === 'NONE' && (
+            <button
+              className="btn-primary"
+              onClick={async () => {
+                await sendRequest(userId);
+                setFriendStatus('PENDING');
+              }}
+            >
+              + Add Friend
+            </button>
+          )}
+
+          {friendStatus === 'PENDING' && (
+            <button
+              className="btn-secondary"
+              disabled
+            >
+              ⏳ Request Sent
+            </button>
+          )}
+
+          {friendStatus === 'ACCEPTED' && (
+            <button
+              className="btn-secondary"
+              disabled
+            >
+              ✓ Friends
+            </button>
+          )}
+
+          {friendStatus === 'BLOCKED' && (
+            <button
+              className="btn-secondary"
+              disabled
+            >
+              🚫 Blocked
+            </button>
+          )}
+
+          <button
+            className="btn-secondary"
+            onClick={() => navigate(-1)}
+          >
+            ← Back
+          </button>
+
+        </div>
       </section>
 
-      {/* Stories strip — only shown when user has active stories */}
-            {stories.length > 0 && (
-              <div style={{ padding: '0 16px', marginTop: 12 }}>
-                <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 8 }}>Your Stories</h3>
-                <StoryStrip
-                  stories={stories}
-                  onStoryClick={setSelectedContent}
-                />
-              </div>
-            )}
-
-      {/* Posts + Friends layout */}
+      {/* Posts */}
       <div className="profile-body">
 
         <section
@@ -139,7 +209,9 @@ export default function UserProfilePage() {
           <h2>Posts</h2>
 
           {posts.length === 0 ? (
-            <p className="empty-state">No posts yet.</p>
+            <p className="empty-state">
+              No posts yet.
+            </p>
           ) : (
             posts.map(post => (
               <PostCard
@@ -153,7 +225,8 @@ export default function UserProfilePage() {
 
       </div>
 
-      {setSelectedContent && (
+      {/* Content modal */}
+      {selectedContent && (
         <ContentModal
           content={selectedContent}
           onClose={() => setSelectedContent(null)}
