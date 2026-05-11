@@ -43,11 +43,4 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    // Get current authenticated user's info
-    @GetMapping("/me")
-    public ResponseEntity<UserDto> me(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(
-                userService.getCurrentUser(userDetails.getUsername())
-        );
-    }
 }
