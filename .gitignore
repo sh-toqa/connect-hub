@@ -5,6 +5,7 @@ backend/mvnw.cmd
 backend/mvnw
 backend/.idea/
 backend/.env
+backend/uploads/
 *.class
 
 # Frontend (React)
