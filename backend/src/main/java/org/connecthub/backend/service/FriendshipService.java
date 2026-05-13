@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.connecthub.backend.dto.response.FriendshipDto;
 import org.connecthub.backend.dto.response.UserDto;
 import org.connecthub.backend.enums.FriendshipStatus;
+import org.connecthub.backend.exception.FriendshipConflictException;
 import org.connecthub.backend.exception.ResourceNotFoundException;
 import org.connecthub.backend.mapper.UserMapper;
 import org.connecthub.backend.model.Friendship;
@@ -35,7 +36,7 @@ public class FriendshipService {
 
         // If friendship exists
         friendshipRepository.findBetweenUsers(requesterId, receiverId)
-                .ifPresent(f -> {throw new IllegalStateException("Friendship already exists");});
+                .ifPresent(f -> {throw new FriendshipConflictException("Friendship already exists");});
 
         Friendship friendship = Friendship.builder()
                 .requester(requester)
