@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -89,12 +91,10 @@ public class UserService {
 
     // Invalidate the user's token (logout)
     @Transactional
-    public void logout(String email) {
-
-        userRepository.findByEmail(email).ifPresent(user -> {
-            user.setStatus(UserStatus.OFFLINE);
-            log.info("User logged out: {}", email);
-        });
+    public void logout(String userId) {
+        User user = userRepository.findById(UUID.fromString(userId))
+                .orElseThrow();
+        user.setStatus(UserStatus.OFFLINE);
     }
 
     // Update user status (ONLINE, OFFLINE)
