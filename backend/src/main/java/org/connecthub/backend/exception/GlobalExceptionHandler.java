@@ -39,10 +39,31 @@ public class GlobalExceptionHandler {
                 "One or more fields are invalid", req.getRequestURI(), fieldErrors));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadRequest(
+            IllegalArgumentException ex,
+            HttpServletRequest req) {
+
+        return build(
+                HttpStatus.BAD_REQUEST,
+                "Bad Request",
+                ex.getMessage(),
+                req
+        );
+    }
+
     // ── Business rule violations (409) ───────────────────────────────────────
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ApiErrorResponse> handleEmailExists(
             EmailAlreadyExistsException ex, HttpServletRequest req) {
+        return conflict(ex.getMessage(), req);
+    }
+
+    @ExceptionHandler(FriendshipConflictException.class)
+    public ResponseEntity<ApiErrorResponse> handleFriendshipConflict(
+            FriendshipConflictException ex,
+            HttpServletRequest req) {
+
         return conflict(ex.getMessage(), req);
     }
 
