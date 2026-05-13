@@ -3,6 +3,7 @@ package org.connecthub.backend.service;
 import org.connecthub.backend.dto.response.FriendshipDto;
 import org.connecthub.backend.enums.FriendshipStatus;
 import org.connecthub.backend.enums.UserStatus;
+import org.connecthub.backend.exception.FriendshipConflictException;
 import org.connecthub.backend.exception.ResourceNotFoundException;
 import org.connecthub.backend.mapper.UserMapper;
 import org.connecthub.backend.model.Friendship;
@@ -83,7 +84,7 @@ class FriendshipServiceTest {
         }
 
         @Test 
-        @DisplayName("Already friends — throws IllegalStateException")
+        @DisplayName("Already friends — throws FriendshipConflictException")
         void sendRequest_alreadyExists_throwsException() {
             when(userRepository.findById(aliceId)).thenReturn(Optional.of(alice));
             when(userRepository.findById(bobId)).thenReturn(Optional.of(bob));
@@ -94,7 +95,7 @@ class FriendshipServiceTest {
                     .thenReturn(Optional.of(existing));
 
             assertThatThrownBy(() -> friendshipService.sendRequest(aliceId, bobId))
-                    .isInstanceOf(IllegalStateException.class);
+                    .isInstanceOf(FriendshipConflictException.class);
             verify(friendshipRepository, never()).save(any());
         }
 
