@@ -204,21 +204,24 @@ class UserServiceTest {
     @DisplayName("Logout sets user status to OFFLINE")
     void logout_setsUserStatusToOffline() {
         // Arrange
-        String email = "alice@example.com";
+        UUID id = UUID.randomUUID();
 
         User user = User.builder()
-                .email(email)
+                .userId(id)
+                .email("alice@example.com")
                 .status(UserStatus.ONLINE)
                 .build();
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findById(id))
+                .thenReturn(Optional.of(user));
 
         // Act
-        userService.logout(email);
+        userService.logout(id.toString());
 
         // Assert
         assertThat(user.getStatus()).isEqualTo(UserStatus.OFFLINE);
 
+        verify(userRepository).findById(id);
     }
 
     
