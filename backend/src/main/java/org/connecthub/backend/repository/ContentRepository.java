@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,8 +28,10 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
     List<Content> findByAuthor_UserIdAndContentTypeOrderByTimestampDesc(
             UUID authorId,
             ContentType contentType
-    );
-    
+        );
+
+    // Newsfeed: posts from a list of friend IDs, newest first, paginated.
+    // Excludes content from blocked users (handled in service layer via friendIds list).
     @Query("""
         SELECT c FROM Content c
         WHERE c.author.userId IN :friendIds
@@ -41,8 +44,13 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
             Pageable pageable);
 
     // Delete expired stories (older than 24 hours) - scheduled task will call this method daily
-    @Modifying
+    @Modifying(clearAutomatically = true)   // evicts the 1st-level cache after the UPDATE
     @Query("DELETE FROM Content c WHERE c.contentType = 'STORY' AND c.timestamp < :expiryTime")
     int deleteExpiredStories(@Param("expiryTime") LocalDateTime expiryTime);
 
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Content c SET c.timestamp = :ts WHERE c.contentId = :id")
+    void backdateTimestamp(@Param("id") UUID id, @Param("ts") LocalDateTime ts);
 }
