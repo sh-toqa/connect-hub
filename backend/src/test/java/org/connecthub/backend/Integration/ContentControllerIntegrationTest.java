@@ -318,12 +318,14 @@ class ContentControllerIntegrationTest {
 		@Test
 		@DisplayName("TC-CC-17 | Feed stories excludes expired stories (older than 24h)")
 		void getFeedStories_expiredStories_notReturned() throws Exception {
-			// Save a story and manually backdate it to 25 hours ago
+
+			// Save expired story then backdate it using JPQL (bypasses updatable=false)
 			Content expired = contentRepository.save(Content.builder()
 					.author(bob).contentText("Expired story")
 					.contentType(ContentType.STORY).build());
-			expired.setTimestamp(LocalDateTime.now().minusHours(25));
-			contentRepository.save(expired);
+			contentRepository.backdateTimestamp(
+					expired.getContentId(),
+					LocalDateTime.now().minusHours(25));
 
 			// Active story
 			contentRepository.save(Content.builder()
