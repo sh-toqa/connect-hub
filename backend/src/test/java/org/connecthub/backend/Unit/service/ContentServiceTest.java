@@ -283,6 +283,8 @@ class ContentServiceTest {
                     .status(FriendshipStatus.ACCEPTED).build();
             when(friendshipRepository.findAcceptedFriendships(authorId))
                     .thenReturn(List.of(friendship));
+            when(friendshipRepository.findBlockedUserIds(authorId))
+                    .thenReturn(List.of());
 
             Content post = Content.builder()
                     .contentId(UUID.randomUUID())
@@ -306,6 +308,8 @@ class ContentServiceTest {
         @DisplayName("No friends — returns empty page immediately")
         void getFriendPosts_noFriends_returnsEmptyPage() {
             when(friendshipRepository.findAcceptedFriendships(authorId))
+                    .thenReturn(List.of());
+            when(friendshipRepository.findBlockedUserIds(authorId))
                     .thenReturn(List.of());
 
             Page<ContentDto> result = contentService.getFriendPosts(authorId, 0, 10);
