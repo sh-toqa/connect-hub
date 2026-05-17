@@ -298,10 +298,10 @@ class SystemTest {
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].contentId").value(storyId));
 
-        // Step 3 — Simulate story expiry by backdating its timestamp
-        Content story = contentRepository.findById(UUID.fromString(storyId)).orElseThrow();
-        story.setTimestamp(LocalDateTime.now().minusHours(25));
-        contentRepository.save(story);
+        // Step 3 — Simulate expiry: JPQL UPDATE bypasses updatable=false + clears session cache
+        contentRepository.backdateTimestamp(
+                UUID.fromString(storyId),
+                LocalDateTime.now().minusHours(25));
 
         // Step 4 — Story no longer appears in Bob's feed (service filters expired)
         mockMvc.perform(get("/content/feed/stories")
