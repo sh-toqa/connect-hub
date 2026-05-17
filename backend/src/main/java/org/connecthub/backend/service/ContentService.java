@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -131,11 +132,16 @@ public class ContentService {
 
     // Helper method to get a list of accepted friend IDs for a user, used to fetch newsfeed content
     private List<UUID> getAcceptedFriendIds(UUID userId) {
-        return friendshipRepository.findAcceptedFriendships(userId)
+        List<UUID> friendIds = new ArrayList<>(
+        friendshipRepository.findAcceptedFriendships(userId)
                 .stream()
                 .map(f -> f.getRequester().getUserId().equals(userId)
                         ? f.getReceiver().getUserId()
                         : f.getRequester().getUserId())
-                .toList();
+                .toList()
+        );
+        List<UUID> blockedIds = friendshipRepository.findBlockedUserIds(userId);
+        friendIds.removeAll(blockedIds);
+        return friendIds;
     }
 }
