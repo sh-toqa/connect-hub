@@ -1,4 +1,4 @@
-package org.connecthub.backend.service;
+package org.connecthub.backend.Unit.service;
 
 import org.connecthub.backend.dto.response.FriendshipDto;
 import org.connecthub.backend.enums.FriendshipStatus;
@@ -10,6 +10,7 @@ import org.connecthub.backend.model.Friendship;
 import org.connecthub.backend.model.User;
 import org.connecthub.backend.repository.FriendshipRepository;
 import org.connecthub.backend.repository.UserRepository;
+import org.connecthub.backend.service.FriendshipService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
