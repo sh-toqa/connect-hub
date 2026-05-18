@@ -18,19 +18,19 @@ export default function Navbar() {
   return (
     <nav className="navbar" role="navigation" aria-label="Main navigation">
       <NavLink to="/" className="navbar-brand">
-        <span className="brand-icon">⚡</span>
+        <span className="brand-icon"></span>
         ConnectHub
       </NavLink>
 
       <div className="navbar-links">
         <NavLink to="/feed"    className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          🏠 Home
+          Home
         </NavLink>
         <NavLink to="/profile" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          👤 Profile
+          Profile
         </NavLink>
         <NavLink to="/friends" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-          👥 Friends
+          Friends
         </NavLink>
       </div>
 

@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { useContent }    from '../hooks/useContent';
-import CreatePostForm    from '../components/content/CreatePostForm';
-import StoryStrip        from '../components/content/StoryStrip';
-import ContentModal      from '../components/content/ContentModal';
-import PostCard          from '../components/profile/PostCard';
+import { useState }            from 'react';
+import { useContent }          from '../hooks/useContent';
+import CreatePostForm           from '../components/content/CreatePostForm';
+import StoryStrip               from '../components/content/StoryStrip';
+import ContentModal             from '../components/content/ContentModal';
+import PostCard                 from '../components/profile/PostCard';
+import NewsfeedLeftSidebar      from '../components/content/NewsfeedLeftSidebar';
+import NewsfeedRightSidebar     from '../components/content/NewsfeedRightSidebar';
 import '../components/content/content.css';
 
 export default function NewsfeedPage() {
@@ -15,61 +17,70 @@ export default function NewsfeedPage() {
   const [selectedContent, setSelectedContent] = useState(null);
 
   return (
-    <div className="newsfeed-page">
+    <div className="newsfeed-layout">
 
-      <CreatePostForm
-        onSubmitPost={submitPost}
-        onSubmitStory={submitStory}
-      />
+      <NewsfeedLeftSidebar />
 
-      <StoryStrip
-        stories={stories}
-        onStoryClick={setSelectedContent}
-      />
+      <main className="newsfeed-center">
 
-      <div className="feed-header">
-        <h2>Feed</h2>
-        <button className="refresh-btn" onClick={reload} aria-label="Refresh feed">
-          🔄 Refresh
-        </button>
-      </div>
+        <CreatePostForm
+          onSubmitPost={submitPost}
+          onSubmitStory={submitStory}
+        />
 
-      {loading && (
-        <div className="feed-loading" role="status">
-          <div className="spinner" />
-          <p>Loading feed…</p>
+        <StoryStrip
+          stories={stories}
+          onStoryClick={setSelectedContent}
+        />
+
+        <div className="feed-header">
+          <h2>Feed</h2>
+          <button className="refresh-btn" onClick={reload} aria-label="Refresh feed">
+            🔄 Refresh
+          </button>
         </div>
-      )}
 
-      {error && !loading && (
-        <div className="feed-error" role="alert">
-          <p>⚠ {error}</p>
-          <button className="btn-secondary" onClick={reload}>Retry</button>
-        </div>
-      )}
+        {loading && (
+          <div className="feed-loading" role="status">
+            <div className="spinner" />
+            <p>Loading feed…</p>
+          </div>
+        )}
 
-      {!loading && !error && (
-        <>
-          {posts.length === 0
-            ? <div className="feed-empty"><p>Nothing here yet — create a post to get started!</p></div>
-            : posts.map(post => (
-                <PostCard
-                  key={post.contentId}
-                  post={post}
-                  onDelete={removeContent}
-                  onClick={setSelectedContent}
-                />
-              ))
-          }
-          {hasMore && (
-            <button className="btn-secondary load-more-feed-btn" onClick={loadMorePosts}>
-              Load more
-            </button>
-          )}
-        </>
-      )}
+        {error && !loading && (
+          <div className="feed-error" role="alert">
+            <p>⚠ {error}</p>
+            <button className="btn-secondary" onClick={reload}>Retry</button>
+          </div>
+        )}
 
-      {/* Modal viewer for posts and stories */}
+        {!loading && !error && (
+          <>
+            {posts.length === 0
+              ? <div className="feed-empty"><p>Nothing here yet — create a post to get started!</p></div>
+              : posts.map(post => (
+                  <PostCard
+                    key={post.contentId}
+                    post={post}
+                    onDelete={removeContent}
+                    onClick={setSelectedContent}
+                  />
+                ))
+            }
+            {hasMore && (
+              <button className="btn-secondary load-more-feed-btn" onClick={loadMorePosts}>
+                Load more
+              </button>
+            )}
+          </>
+        )}
+
+      </main>
+
+      {/* ── Right sidebar ────────────────────────────────────────────────── */}
+      <NewsfeedRightSidebar />
+
+      {/* ── Content modal ────────────────────────────────────────────────── */}
       {selectedContent && (
         <ContentModal
           content={selectedContent}

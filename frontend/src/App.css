@@ -365,3 +365,175 @@ body {
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+
+/* ── Three-column newsfeed layout ────────────────────────────────────────── */
+.newsfeed-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr 280px;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 16px;
+  align-items: start;
+}
+
+/* Center feed — was .newsfeed-page */
+.newsfeed-center {
+  min-width: 0;   /* prevents grid blowout */
+}
+
+/* Sidebars — sticky so they stay visible while scrolling */
+.feed-sidebar {
+  position: sticky;
+  top: 76px;      /* 60px navbar + 16px gap */
+  max-height: calc(100vh - 92px);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.feed-sidebar::-webkit-scrollbar { display: none; }
+
+/* ── Responsive — collapse sidebars on smaller screens ──────────────────── */
+@media (max-width: 1024px) {
+  .newsfeed-layout {
+    grid-template-columns: 200px 1fr;
+  }
+  .feed-sidebar--right { display: none; }
+}
+
+@media (max-width: 768px) {
+  .newsfeed-layout {
+    grid-template-columns: 1fr;
+    padding: 0 8px;
+  }
+  .feed-sidebar--left { display: none; }
+}
+
+/* ── Left sidebar styles ─────────────────────────────────────────────────── */
+.sidebar-profile-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+}
+.sidebar-profile-card:hover { background: #f0f2f5; }
+
+.sidebar-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: #e4e6eb;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: #65676b;
+}
+.sidebar-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.sidebar-profile-info { min-width: 0; }
+.sidebar-username {
+  font-weight: 700; font-size: 14px;
+  margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sidebar-bio {
+  font-size: 12px; color: #65676b;
+  margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: #e4e6eb;
+  margin: 8px 0;
+}
+
+.sidebar-nav { display: flex; flex-direction: column; gap: 2px; }
+.sidebar-nav-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #1c1e21;
+  font-size: 14px; font-weight: 500;
+  transition: background 0.15s;
+}
+.sidebar-nav-link:hover { background: #f0f2f5; color: #1877f2; }
+
+/* ── Right sidebar styles ────────────────────────────────────────────────── */
+.sidebar-section { padding: 4px 0 8px; }
+
+.sidebar-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px; font-weight: 700;
+  color: #65676b;
+  margin: 0 0 8px;
+  padding: 0 4px;
+}
+
+.sidebar-section-link {
+  font-size: 12px; font-weight: 500;
+  color: #1877f2; text-decoration: none;
+}
+.sidebar-section-link:hover { text-decoration: underline; }
+
+.sidebar-empty {
+  font-size: 13px; color: #65676b;
+  padding: 4px 4px; margin: 0;
+}
+
+.sidebar-friend-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  text-decoration: none; color: inherit;
+  transition: background 0.15s;
+  position: relative;
+}
+.sidebar-friend-item:hover { background: #f0f2f5; }
+
+.sidebar-friend-avatar-wrap { position: relative; flex-shrink: 0; }
+
+.sidebar-friend-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #e4e6eb;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #65676b;
+}
+.sidebar-friend-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.sidebar-friend-name {
+  font-size: 13px; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.sidebar-suggestion-item {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.sidebar-suggestion-item:hover { background: #f0f2f5; }
+
+.sidebar-suggestion-info {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; color: inherit;
+  flex: 1; min-width: 0;
+}
+
+.sidebar-add-btn {
+  background: #e7f0fd;
+  color: #1877f2;
+  border: none; border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; flex-shrink: 0;
+  transition: background 0.15s;
+}
+.sidebar-add-btn:hover { background: #cce0ff; }
