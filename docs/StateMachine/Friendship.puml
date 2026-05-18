@@ -1,0 +1,14 @@
+@startuml ConnectHub_StateMachine_Friendship
+
+[*] --> PENDING : User sends friend request
+
+PENDING --> ACCEPTED : Receiver accepts request
+PENDING --> [*] : Receiver declines request
+PENDING --> BLOCKED : Receiver blocks requester
+
+ACCEPTED --> [*] : Either user removes friend
+ACCEPTED --> BLOCKED : Either user blocks the other
+
+BLOCKED --> [*] : Blocker unblocks target
+
+@enduml

@@ -1,0 +1,23 @@
+@startuml ConnectHub_Sequence_UnblockUser
+actor User
+participant "React Frontend" as FE
+participant "FriendshipController" as FC
+participant "FriendshipService" as FS
+participant "FriendshipRepository" as FR
+database "MySQL" as DB
+
+User -> FE: Click Unblock
+FE -> FC: DELETE /friends/block/{targetId} (Bearer JWT)
+FC -> FS: unblockUser(blockerId, targetId)
+FS -> FR: findBetweenUsers(blockerId, targetId)
+FR -> DB: SELECT * WHERE users match AND status=BLOCKED
+DB --> FR: Friendship (BLOCKED)
+FR --> FS: Friendship entity
+FS -> FR: delete(friendship)
+FR -> DB: DELETE FROM friendships WHERE friendshipId=?
+DB --> FR: deleted
+FR --> FS: void
+FS --> FC: void
+FC --> FE: 204 No Content
+FE --> User: User is unblocked
+@enduml

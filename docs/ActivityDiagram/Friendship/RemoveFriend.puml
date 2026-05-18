@@ -1,0 +1,25 @@
+@startuml ConnectHub_Activity_RemoveFriend
+start
+:User clicks Unfriend;
+:DELETE /friendships/{friendshipId} (Bearer JWT);
+if (JWT valid?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+:Fetch Friendship by friendshipId;
+if (Friendship exists?) then (no)
+  :Return 404 Not Found;
+  stop
+else (yes)
+endif
+if (User is a participant?) then (no)
+  :Return 403 Forbidden;
+  stop
+else (yes)
+endif
+:Delete Friendship from database;
+:Return 204 No Content;
+:UI updates to Add Friend;
+stop
+@enduml

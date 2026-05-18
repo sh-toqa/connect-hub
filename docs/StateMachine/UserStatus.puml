@@ -1,0 +1,72 @@
+@startuml ConnectHub_StateMachine_System
+
+[*] --> Unauthenticated : App launched
+
+Unauthenticated --> Registered : POST /auth/register\n(valid details)
+Unauthenticated --> Authenticated : POST /auth/login\n(valid credentials)
+Registered --> Authenticated : POST /auth/login\n(after registration)
+
+state Authenticated {
+
+  [*] --> Newsfeed
+
+  state "Newsfeed" as Newsfeed {
+    [*] --> BrowsingFeed
+    BrowsingFeed --> BrowsingFeed : Scroll / paginate
+  }
+
+  state "Content Management" as ContentMgmt {
+    [*] --> Idle
+    Idle --> CreatingPost : Click Create Post
+    Idle --> CreatingStory : Click Create Story
+    CreatingPost --> Idle : Post submitted\n(201 Created)
+    CreatingPost --> Idle : Cancelled
+    CreatingStory --> Idle : Story submitted\n(201 Created)
+    CreatingStory --> Idle : Cancelled
+    Idle --> DeletingContent : Click Delete
+    DeletingContent --> Idle : Content deleted\n(204 No Content)
+    DeletingContent --> Idle : 403 Forbidden\n(not author)
+  }
+
+  state "Friendship Management" as FriendMgmt {
+    [*] --> NoRelationship
+    NoRelationship --> RequestSent : Send friend request\n(201 Created)
+    NoRelationship --> Blocked : Block user
+    RequestSent --> Friends : Receiver accepts
+    RequestSent --> NoRelationship : Receiver declines
+    RequestSent --> Blocked : Receiver blocks
+    Friends --> NoRelationship : Either user unfriends
+    Friends --> Blocked : Either user blocks
+    Blocked --> NoRelationship : Blocker unblocks
+  }
+
+  state "Profile Management" as ProfileMgmt {
+    [*] --> ViewingProfile
+    ViewingProfile --> EditingProfile : Click Edit Profile
+    EditingProfile --> ViewingProfile : Changes saved\n(200 OK)
+    EditingProfile --> ViewingProfile : Cancelled
+    ViewingProfile --> UploadingPhoto : Click Upload Photo
+    UploadingPhoto --> ViewingProfile : Photo uploaded\n(200 OK)
+    UploadingPhoto --> ViewingProfile : Invalid file\n(400 Bad Request)
+    ViewingProfile --> ChangingPassword : Click Change Password
+    ChangingPassword --> ViewingProfile : Password updated\n(200 OK)
+    ChangingPassword --> ViewingProfile : Wrong current password\n(400 Bad Request)
+  }
+
+  state "Story Lifecycle" as StoryLife {
+    [*] --> StoryActive
+    StoryActive --> StoryExpired : 24 hours elapsed\n(@Scheduled job)
+    StoryExpired --> [*] : Deleted from database
+  }
+
+  Newsfeed --> ContentMgmt : Create / Delete content
+  Newsfeed --> FriendMgmt : Visit user profile
+  Newsfeed --> ProfileMgmt : Visit own profile
+  ContentMgmt --> Newsfeed : Done
+  FriendMgmt --> Newsfeed : Done
+  ProfileMgmt --> Newsfeed : Done
+}
+
+Authenticated --> Unauthenticated : POST /auth/logout\n(status set to OFFLINE)
+
+@enduml

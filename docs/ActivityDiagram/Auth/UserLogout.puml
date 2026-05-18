@@ -1,0 +1,15 @@
+@startuml ConnectHub_Activity_Logout
+start
+:User clicks Logout;
+:POST /auth/logout (Bearer JWT);
+if (JWT valid?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+:Update user status to OFFLINE;
+:Return 200 OK;
+:Frontend clears token from memory;
+:Redirect to Login page;
+stop
+@enduml

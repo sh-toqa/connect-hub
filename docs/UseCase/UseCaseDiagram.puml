@@ -1,0 +1,63 @@
+@startuml
+left to right direction
+
+actor Guest
+actor Member
+actor Scheduler
+
+rectangle "Connect Hub" {
+
+  (Register)
+  (Login)
+  (Logout)
+
+  (View Newsfeed)
+
+  (Create Post)
+  (Delete Post)
+
+  (Create Story)
+  (Auto-Expire Stories)
+
+  (View Profile)
+  (Edit Profile)
+  (Upload Photo)
+
+  (Send Friend Request)
+  (Accept Friend Request)
+  (Decline Friend Request)
+  (Remove Friend)
+
+  (Block User)
+  (Unblock User)
+
+  Guest --> (Register)
+  Guest --> (Login)
+
+  Member --> (Logout)
+
+  Member --> (View Newsfeed)
+
+  Member --> (Create Post)
+  Member --> (Delete Post)
+
+  Member --> (Create Story)
+
+  Member --> (View Profile)
+  Member --> (Edit Profile)
+
+  Member --> (Send Friend Request)
+  Member --> (Accept Friend Request)
+  Member --> (Decline Friend Request)
+  Member --> (Remove Friend)
+
+  Member --> (Block User)
+  Member --> (Unblock User)
+
+  Scheduler --> (Auto-Expire Stories)
+
+  (Create Post) .> (Upload Photo) : <<include>>
+  (Create Story) .> (Upload Photo) : <<include>>
+
+}
+@enduml

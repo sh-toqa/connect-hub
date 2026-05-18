@@ -1,0 +1,28 @@
+@startuml ConnectHub_Sequence_Register
+actor User
+participant "React Frontend" as FE
+participant "AuthController" as AC
+participant "UserService" as US
+participant "UserRepository" as UR
+database "MySQL" as DB
+
+User -> FE: Fill registration form
+FE -> AC: POST /auth/register (RegisterRequest)
+AC -> US: register(request)
+US -> UR: existsByEmail(email)
+UR -> DB: SELECT EXISTS WHERE email=?
+DB --> UR: false
+UR --> US: false
+US -> UR: existsByUsername(username)
+UR -> DB: SELECT EXISTS WHERE username=?
+DB --> UR: false
+UR --> US: false
+US -> US: BCrypt.hash(password)
+US -> UR: save(user)
+UR -> DB: INSERT INTO users
+DB --> UR: saved User
+UR --> US: UserDto
+US --> AC: UserDto
+AC --> FE: 201 Created + UserDto
+FE --> User: Redirect to Login
+@enduml

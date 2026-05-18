@@ -1,0 +1,25 @@
+@startuml
+start
+:User fills registration form;
+if (Client-side validation passed?) then (no)
+  :Show form errors;
+  stop
+else (yes)
+endif
+:POST /auth/register;
+if (Email format valid?) then (no)
+  :Return 400 Bad Request;
+  stop
+else (yes)
+endif
+if (Email already exists?) then (yes)
+  :Return 409 Conflict;
+  stop
+else (no)
+endif
+:Hash password with BCrypt;
+:Persist User record to DB;
+:Return 201 Created;
+:Frontend redirects to Login;
+stop
+@enduml

@@ -1,0 +1,25 @@
+@startuml ConnectHub_Activity_UnblockUser
+start
+:User clicks Unblock;
+:DELETE /friendships/unblock/{targetId} (Bearer JWT);
+if (JWT valid?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+:Fetch Friendship between users;
+if (Blocked friendship exists?) then (no)
+  :Return 404 Not Found;
+  stop
+else (yes)
+endif
+if (User is the blocker?) then (no)
+  :Return 403 Forbidden;
+  stop
+else (yes)
+endif
+:Delete Friendship from database;
+:Return 204 No Content;
+:User is unblocked;
+stop
+@enduml

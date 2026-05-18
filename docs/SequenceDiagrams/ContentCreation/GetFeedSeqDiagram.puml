@@ -1,0 +1,29 @@
+@startuml ConnectHub_Sequence_GetFeed
+actor User
+participant "React Frontend" as FE
+participant "ContentController" as CC
+participant "ContentService" as CS
+participant "FriendshipRepository" as FR
+participant "ContentRepository" as CR
+database "MySQL" as DB
+
+User -> FE: Open Newsfeed
+FE -> CC: GET /content/feed/posts?page=0&size=10 (Bearer JWT)
+CC -> CS: getFriendPosts(userId, page, size)
+CS -> FR: findAcceptedFriendships(userId)
+FR -> DB: SELECT friendships WHERE status=ACCEPTED
+DB --> FR: List<Friendship>
+FR --> CS: List<UUID> friendIds
+CS -> FR: findBlockedUserIds(userId)
+FR -> DB: SELECT blocked user ids
+DB --> FR: List<UUID> blockedIds
+FR --> CS: blockedIds
+CS -> CS: friendIds.removeAll(blockedIds)
+CS -> CR: findFriendContent(friendIds, POST, pageable)
+CR -> DB: SELECT content WHERE authorId IN (?) ORDER BY timestamp DESC
+DB --> CR: Page<Content>
+CR --> CS: Page<Content>
+CS --> CC: Page<ContentDto>
+CC --> FE: 200 OK + Page<ContentDto>
+FE --> User: Renders post cards
+@enduml

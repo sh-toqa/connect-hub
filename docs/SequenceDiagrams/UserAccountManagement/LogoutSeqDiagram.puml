@@ -1,0 +1,19 @@
+@startuml ConnectHub_Sequence_Logout
+actor User
+participant "React Frontend" as FE
+participant "AuthController" as AC
+participant "UserService" as US
+participant "UserRepository" as UR
+database "MySQL" as DB
+
+User -> FE: Click Logout
+FE -> AC: POST /auth/logout (Bearer JWT)
+AC -> US: logout(email)
+US -> UR: updateStatus(OFFLINE)
+UR -> DB: UPDATE users SET status=OFFLINE
+DB --> UR: updated
+UR --> US: void
+US --> AC: void
+AC --> FE: 200 OK
+FE --> User: Redirect to Login
+@enduml

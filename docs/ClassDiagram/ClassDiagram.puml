@@ -1,0 +1,323 @@
+@startuml ConnectHub_ClassDiagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "Presentation Layer" {
+
+  class AuthController {
+    - userService: UserService
+
+    + register(request): ResponseEntity<UserDto>
+    + login(request): ResponseEntity<LoginResponse>
+    + logout(userDetails): ResponseEntity<Void>
+  }
+
+  class ProfileController {
+
+    - profileService: ProfileService
+
+    + getMyProfile(): ResponseEntity<UserDto>
+    + getUserProfile(userId): ResponseEntity<UserDto>
+
+    + updateProfile(request): ResponseEntity<UserDto>
+
+    + uploadProfilePhoto(file): ResponseEntity<UserDto>
+    + uploadCoverPhoto(file): ResponseEntity<UserDto>
+
+    + updatePassword(request): ResponseEntity<Void>
+
+    + getMyPosts(page,size): ResponseEntity<Page<ContentDto>>
+    + getMyStories(page,size): ResponseEntity<Page<ContentDto>>
+    + getMyFriends(): ResponseEntity<List<UserDto>>
+
+    + getUserPosts(userId,page,size): ResponseEntity<Page<ContentDto>>
+    + getUserStories(userId,page,size): ResponseEntity<Page<ContentDto>>
+
+    - extractUserId(userDetails): UUID
+  }
+
+  class ContentController {
+    - contentService: ContentService
+
+    + createPost(contentText,image): ResponseEntity<ContentDto>
+    + createStory(contentText,image): ResponseEntity<ContentDto>
+
+    + deleteContent(contentId): ResponseEntity<Void>
+
+    + getFeedPosts(page,size): ResponseEntity<Page<ContentDto>>
+    + getFeedStories(): ResponseEntity<List<ContentDto>>
+
+    - extractUserId(userDetails): UUID
+  }
+
+  class FriendshipController {
+
+    - friendshipService: FriendshipService
+
+    + sendRequest(receiverId): ResponseEntity<FriendshipDto>
+
+    + acceptRequest(friendshipId): ResponseEntity<FriendshipDto>
+
+    + declineRequest(friendshipId): ResponseEntity<Void>
+
+    + removeFriend(friendshipId): ResponseEntity<Void>
+
+    + blockUser(targetId): ResponseEntity<FriendshipDto>
+
+    + unblockUser(targetId): ResponseEntity<Void>
+
+    + getPendingRequests(): ResponseEntity<List<FriendshipDto>>
+
+    + getFriends(): ResponseEntity<List<FriendshipDto>>
+
+    + getSuggestions(): ResponseEntity<List<UserDto>>
+
+    + getStatus(otherUserId): ResponseEntity<Map<String,String>>
+
+    - extractUserId(userDetails): UUID
+  }
+}
+
+package "Business Layer" {
+
+  class UserService {
+    - userRepository: UserRepository
+    - passwordEncoder: PasswordEncoder
+    - jwtUtil: JwtUtil
+    - userMapper: UserMapper
+
+    + register(request: RegisterRequest): UserDto
+    + login(request: LoginRequest): LoginResponse
+    + logout(email: String): void
+    + updateStatus(email: String, status: UserStatus): void
+    + getCurrentUser(email: String): UserDto
+  }
+
+  class ProfileService {
+
+    - userRepository: UserRepository
+    - contentRepository: ContentRepository
+    - friendshipRepository: FriendshipRepository
+    - storageService: StorageService
+    - passwordEncoder: PasswordEncoder
+    - userMapper: UserMapper
+
+    + getProfile(userId: UUID): UserDto
+
+    + updateProfile(userId: UUID, request: UpdateProfileRequest): UserDto
+
+    + updateProfilePhoto(userId: UUID, file: MultipartFile): UserDto
+
+    + updateCoverPhoto(userId: UUID, file: MultipartFile): UserDto
+
+    + updatePassword(userId: UUID, request: UpdatePasswordRequest): void
+
+    + getOwnPosts(userId: UUID, page: int, size: int): Page<ContentDto>
+
+    + getOwnStories(userId: UUID, page: int, size: int): Page<ContentDto>
+
+    + getFriends(userId: UUID): List<UserDto>
+
+    - findUser(userId: UUID): User
+  }
+
+  class ContentService {
+
+    - contentRepository: ContentRepository
+    - userRepository: UserRepository
+    - friendshipRepository: FriendshipRepository
+    - storageService: StorageService
+    - userMapper: UserMapper
+
+    + createPost(authorId: UUID, request: CreateContentRequest, image: MultipartFile): ContentDto
+
+    + createStory(userId: UUID, request: CreateContentRequest, image: MultipartFile): ContentDto
+
+    + deleteContent(contentId: UUID, requesterId: UUID): void
+
+    + getFriendPosts(userId: UUID, page: int, size: int): Page<ContentDto>
+
+    + getFriendStories(userId: UUID): List<ContentDto>
+
+    + deleteExpiredStories(): void
+
+    - createContent(authorId: UUID, text: String, image: MultipartFile, type: ContentType): ContentDto
+
+    - getAcceptedFriendIds(userId: UUID): List<UUID>
+  }
+
+  class FriendshipService {
+
+    - friendshipRepository: FriendshipRepository
+    - userRepository: UserRepository
+    - userMapper: UserMapper
+
+    + sendRequest(requesterId: UUID, receiverId: UUID): FriendshipDto
+
+    + acceptRequest(friendshipId: UUID, userId: UUID): FriendshipDto
+
+    + declineRequest(friendshipId: UUID, userId: UUID): void
+
+    + removeFriend(friendshipId: UUID, userId: UUID): void
+
+    + blockUser(blockerId: UUID,targetId: UUID): FriendshipDto
+
+    + unblockUser(blockerId: UUID,targetId: UUID): void
+
+    + getPendingRequests(userId: UUID): List<FriendshipDto>
+
+    + getFriends(userId: UUID): List<FriendshipDto>
+
+    + getSuggestions(userId: UUID): List<UserDto>
+
+    + getStatus(userId: UUID,otherUserId: UUID): String
+
+    - findUser(userId: UUID): User
+
+    - findFrienship(friendshipId: UUID): Friendship
+
+    - ensureReceiver(friendship: Friendship, userId: UUID): void
+
+    - ensureParticipant(friendship: Friendship, userId: UUID): void
+  }
+
+  interface StorageService {
+    + store(file: MultipartFile, subDir: String): String
+    + delete(filePath: String): void
+  }
+
+  class LocalStorageService implements StorageService {
+    - ALLOWED_TYPES: List<String> = ["image/jpeg", "image/png", "image/gif"]
+    - MAX_FILE_SIZE_BYTES: long = 5 * 1024 * 1024 // 5MB
+    - uploadRoot: Path
+    + LocalStorageService(uploadRoot: String)
+    + store(file: MultipartFile, subDir: String): String
+    + delete(filePath: String): void
+    - validateFile(file: MultipartFile): void
+    - getExtension(filename: String): String
+  }
+
+  class CustomUserDetailsService implements UserDetailsService {
+    - userRepository: UserRepository
+    + loadUserByUsername(email): UserDetails
+  }
+}
+
+package "Data Layer" {
+  interface UserRepository {
+    + findByEmail(email: String): Optional<User>
+    + findByUsername(username: String): Optional<User>
+    + existsByEmail(email: String): boolean
+    + existsByUsername(username: String): boolean
+    + findSuggestedFriends(currentUserId: UUID): List<User>
+  }
+
+  interface ContentRepository {
+    + findByAuthor_UserIdAndContentTypeOrderByTimestampDesc(authorId: UUID, contentType: ContentType, page: Pageable): Page<Content>
+    + findByAuthor_UserIdAndContentTypeOrderByTimestampDesc(authorId: UUID, contentType: ContentType): List<Content>
+    + findFriendContent(friendsIds: List<UUID>, contentType: ContentType, pageable: Pageable): Page<Content>
+    + deleteExpiredStories(expiryTime: LocalDateTime): int
+  }
+
+  interface FriendshipRepository {
+    + findBetweenUsers(userA: UUID, userB: UUID): Optional<Friendship>
+    + findByReceiverAndStatus(receiver: User, status: FriendshipStatus): List<Friendship>
+    + findBlockedUserIds(userId: UUID): List<UUID>
+    + findAcceptedFriendships(userId: UUID): List<Friendship>
+    + isBlocked(blockerId: UUID, targetId: UUID): boolean
+  }
+}
+
+package "Domain Layer" {
+
+  enum ContentType {
+    POST
+    STORY
+  }
+
+  enum FriendshipStatus {
+    PENDING
+    ACCEPTED
+    BLOCKED
+  }
+
+  enum UserStatus {
+    ONLINE
+    OFFLINE
+  }
+
+  class User {
+    - userId: UUID
+    - email: String
+    - username: String
+    - hashedPassword: String
+    - dateOfBirth: LocalDate
+    - bio: String
+    - profilePhotoPath: String
+    - coverPhotoPath: String
+    - status: UserStatus
+    - createdAt: DateTime
+    - updatedAt: DateTime
+  }
+
+  class Content {
+    - contentId: UUID
+    - contentText: String
+    - imagePath: String
+    - timestamp: LocalDateTime
+    - contentType: ContentType
+  }
+
+  class Friendship {
+    - friendshipId: UUID
+    - requester: User
+    - receiver: User
+    - status: FriendshipStatus
+    - createdAt: LocalDateTime
+    - updatedAt: LocalDateTime
+  }
+}
+
+' Controller -- Service
+' Association
+
+AuthController -- UserService
+
+ProfileController -- ProfileService
+
+ContentController -- ContentService
+
+FriendshipController -- FriendshipService
+
+' Service -> Repository
+' Association
+' they use repository to perform operations but do not own them
+UserService -- UserRepository
+
+ProfileService -- UserRepository
+ProfileService -- ContentRepository
+ProfileService -- FriendshipRepository
+
+ContentService -- ContentRepository
+ContentService -- FriendshipRepository
+
+FriendshipService -- FriendshipRepository
+FriendshipService -- UserRepository
+
+' Repository -> Domain
+' they dont own object
+UserRepository -- User
+ContentRepository -- Content
+FriendshipRepository -- Friendship
+
+
+' Domain Relationships
+
+' Composition
+User "1" *--> "0..*" Content : creates
+User "1" *--> "0..*" Friendship : requester
+User "1" *--> "0..*" Friendship : receiver
+
+@enduml

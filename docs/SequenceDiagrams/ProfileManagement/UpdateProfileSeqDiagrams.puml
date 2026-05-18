@@ -1,0 +1,24 @@
+@startuml ConnectHub_Sequence_UpdateProfile
+actor User
+participant "React Frontend" as FE
+participant "ProfileController" as PC
+participant "ProfileService" as PS
+participant "UserRepository" as UR
+database "MySQL" as DB
+
+User -> FE: Edit bio / username / dateOfBirth
+FE -> PC: PATCH /profile (Bearer JWT, UpdateProfileRequest)
+PC -> PS: updateProfile(userId, request)
+PS -> UR: findById(userId)
+UR -> DB: SELECT * WHERE userId=?
+DB --> UR: User record
+UR --> PS: User entity
+PS -> PS: apply field updates
+PS -> UR: save(user)
+UR -> DB: UPDATE users SET ...
+DB --> UR: updated User
+UR --> PS: User entity
+PS --> PC: UserDto
+PC --> FE: 200 OK + UserDto
+FE --> User: Profile updated
+@enduml

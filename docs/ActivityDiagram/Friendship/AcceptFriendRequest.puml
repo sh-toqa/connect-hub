@@ -1,0 +1,31 @@
+@startuml ConnectHub_Activity_AcceptFriendRequest
+start
+:User clicks Accept on pending request;
+:PUT /friendships/{friendshipId}/accept (Bearer JWT);
+if (JWT valid?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+:Fetch Friendship by friendshipId;
+if (Friendship exists?) then (no)
+  :Return 404 Not Found;
+  stop
+else (yes)
+endif
+if (User is the receiver?) then (no)
+  :Return 403 Forbidden;
+  stop
+else (yes)
+endif
+if (Status is PENDING?) then (no)
+  :Return 400 Bad Request;
+  stop
+else (yes)
+endif
+:Update status to ACCEPTED;
+:Persist to database;
+:Return 200 OK + FriendshipDto;
+:UI shows Now Friends;
+stop
+@enduml

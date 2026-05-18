@@ -1,0 +1,24 @@
+@startuml ConnectHub_Sequence_DeclineFriendRequest
+actor User
+participant "React Frontend" as FE
+participant "FriendshipController" as FC
+participant "FriendshipService" as FS
+participant "FriendshipRepository" as FR
+database "MySQL" as DB
+
+User -> FE: Click Decline
+FE -> FC: DELETE /friends/{friendshipId}/decline (Bearer JWT)
+FC -> FS: declineRequest(friendshipId, userId)
+FS -> FR: findById(friendshipId)
+FR -> DB: SELECT * WHERE friendshipId=?
+DB --> FR: Friendship (PENDING)
+FR --> FS: Friendship entity
+FS -> FS: ensureReceiver(friendship, userId)
+FS -> FR: delete(friendship)
+FR -> DB: DELETE FROM friendships WHERE friendshipId=?
+DB --> FR: deleted
+FR --> FS: void
+FS --> FC: void
+FC --> FE: 204 No Content
+FE --> User: Request removed
+@enduml

@@ -1,0 +1,26 @@
+@startuml ConnectHub_Activity_GetFeed
+start
+:User opens Newsfeed;
+:GET /content/feed/posts (Bearer JWT);
+if (JWT valid?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+:Fetch accepted friendships for user;
+:Extract friend IDs;
+:Fetch blocked user IDs;
+:Remove blocked users from friend IDs;
+if (Friend list empty?) then (yes)
+  :Return empty page;
+  stop
+else (no)
+endif
+:Query Content WHERE authorId IN friendIds;
+:Filter by contentType = POST;
+:Order by timestamp descending;
+:Paginate results (page, size);
+:Return 200 OK + Page<ContentDto>;
+:Frontend renders post cards;
+stop
+@enduml

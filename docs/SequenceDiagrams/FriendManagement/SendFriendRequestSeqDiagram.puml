@@ -1,0 +1,32 @@
+@startuml ConnectHub_Sequence_SendFriendRequest
+actor User
+participant "React Frontend" as FE
+participant "FriendshipController" as FC
+participant "FriendshipService" as FS
+participant "FriendshipRepository" as FR
+participant "UserRepository" as UR
+database "MySQL" as DB
+
+User -> FE: Click Send Request
+FE -> FC: POST /friends/request/{receiverId} (Bearer JWT)
+FC -> FS: sendRequest(userId, receiverId)
+FS -> UR: findById(receiverId)
+UR -> DB: SELECT * WHERE userId=?
+DB --> UR: Receiver User record
+UR --> FS: Receiver User entity
+FS -> UR: findById(userId)
+UR -> DB: SELECT * WHERE userId=?
+DB --> UR: User record
+UR --> FS: Sender User entity
+FS --> FR: findBetweenUsers(senderId, receiverId)
+FR -> DB: SELECT * WHERE (senderId=? AND receiverId=?) OR (senderId=? AND receiverId=?)
+DB --> FR: Optional<Friendship>
+FS -> FS: create new Friendship entity (PENDING)
+FS -> FR: save(friendship)
+FR -> DB: INSERT INTO friendships whERE senderId=?, receiverId=?, status=PENDING
+DB --> FR: saved Friendship
+FR --> FS: Friendship entity
+FS --> FC: FriendshipDto
+FC --> FE: 201 Created + FriendshipDto
+FE --> User: Request Sent
+@enduml

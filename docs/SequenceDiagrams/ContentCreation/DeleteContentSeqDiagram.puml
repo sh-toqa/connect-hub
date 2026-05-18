@@ -1,0 +1,28 @@
+@startuml ConnectHub_Sequence_DeleteContent
+actor User
+participant "React Frontend" as FE
+participant "ContentController" as CC
+participant "ContentService" as CS
+participant "StorageService" as SS
+participant "ContentRepository" as CR
+database "MySQL" as DB
+
+User -> FE: Click delete on post/story
+FE -> CC: DELETE /content/{contentId} (Bearer JWT)
+CC -> CS: deleteContent(contentId, requesterId)
+CS -> CR: findById(contentId)
+CR -> DB: SELECT * WHERE contentId=?
+DB --> CR: Content record
+CR --> CS: Content entity
+CS -> CS: verify requesterId == content.authorId
+alt image exists
+  CS -> SS: delete(imagePath)
+end
+CS -> CR: delete(content)
+CR -> DB: DELETE FROM content WHERE contentId=?
+DB --> CR: deleted
+CR --> CS: void
+CS --> CC: void
+CC --> FE: 204 No Content
+FE --> User: Post/Story removed from UI
+@enduml

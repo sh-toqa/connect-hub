@@ -1,0 +1,31 @@
+@startuml ConnectHub_Activity_CreateStory
+start
+:User creates story with text and optional image;
+:POST /content/stories (Bearer JWT);
+if (JWT valid?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+if (Text or image provided?) then (no)
+  :Return 400 Bad Request;
+  stop
+else (yes)
+endif
+if (Image attached?) then (yes)
+  :Validate file type and size;
+  if (File valid?) then (no)
+    :Return 400 Bad Request;
+    stop
+  else (yes)
+  endif
+  :Store image via StorageService;
+  :Get imagePath;
+else (no)
+endif
+:Create Content entity (type=STORY);
+:Persist to database;
+:Return 201 Created + ContentDto;
+:Story appears in story strip;
+stop
+@enduml

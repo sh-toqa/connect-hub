@@ -1,0 +1,25 @@
+@startuml ConnectHub_Sequence_AcceptFriendRequest
+actor User
+participant "React Frontend" as FE
+participant "FriendshipController" as FC
+participant "FriendshipService" as FS
+participant "FriendshipRepository" as FR
+database "MySQL" as DB
+
+User -> FE: Click Accept
+FE -> FC: PUT /friends/{friendshipId}/accept (Bearer JWT)
+FC -> FS: acceptRequest(friendshipId, userId)
+FS -> FR: findById(friendshipId)
+FR -> DB: SELECT * WHERE friendshipId=?
+DB --> FR: Friendship (PENDING)
+FR --> FS: Friendship entity
+FS -> FS: ensureReceiver(friendship, userId)
+FS -> FS: friendship.setStatus(ACCEPTED)
+FS -> FR: save(friendship)
+FR -> DB: UPDATE friendships SET status=ACCEPTED
+DB --> FR: updated
+FR --> FS: Friendship entity
+FS --> FC: FriendshipDto
+FC --> FE: 200 OK + FriendshipDto
+FE --> User: Now Friends
+@enduml

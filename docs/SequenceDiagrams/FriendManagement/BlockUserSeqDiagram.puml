@@ -1,0 +1,29 @@
+@startuml ConnectHub_Sequence_BlockUser
+actor User
+participant "React Frontend" as FE
+participant "FriendshipController" as FC
+participant "FriendshipService" as FS
+participant "FriendshipRepository" as FR
+database "MySQL" as DB
+
+User -> FE: Click Block
+FE -> FC: POST /friends/block/{targetId} (Bearer JWT)
+FC -> FS: blockUser(blockerId, targetId)
+FS -> FR: findBetweenUsers(blockerId, targetId)
+FR -> DB: SELECT * WHERE users match
+DB --> FR: existing Friendship (any status) or empty
+FR --> FS: Optional<Friendship>
+alt friendship exists
+  FS -> FS: friendship.setStatus(BLOCKED)
+  FS -> FS: friendship.setRequester(blocker)
+else no friendship
+  FS -> FS: create new Friendship(BLOCKED)
+end
+FS -> FR: save(friendship)
+FR -> DB: INSERT or UPDATE friendships SET status=BLOCKED
+DB --> FR: saved
+FR --> FS: Friendship entity
+FS --> FC: FriendshipDto
+FC --> FE: 201 Created + FriendshipDto
+FE --> User: User is blocked
+@enduml

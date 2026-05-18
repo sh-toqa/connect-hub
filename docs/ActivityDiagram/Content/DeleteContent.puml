@@ -1,0 +1,29 @@
+@startuml ConnectHub_Activity_DeleteContent
+start
+:User clicks delete on post or story;
+:DELETE /content/{contentId} (Bearer JWT);
+if (JWT valid?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+:Fetch content by contentId;
+if (Content exists?) then (no)
+  :Return 404 Not Found;
+  stop
+else (yes)
+endif
+if (Requester is author?) then (no)
+  :Return 403 Forbidden;
+  stop
+else (yes)
+endif
+if (Image exists?) then (yes)
+  :Delete image via StorageService;
+else (no)
+endif
+:Delete Content from database;
+:Return 204 No Content;
+:Post/Story removed from UI;
+stop
+@enduml

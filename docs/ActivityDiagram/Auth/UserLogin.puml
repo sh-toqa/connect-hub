@@ -1,0 +1,21 @@
+@startuml ConnectHub_Activity_Login
+start
+:User enters email and password;
+:POST /auth/login;
+if (Email exists?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+if (Password matches hash?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+:Update user status to ONLINE;
+:Generate signed JWT token;
+:Return 200 OK + LoginResponse;
+:Frontend stores token in memory;
+:Redirect to Newsfeed;
+stop
+@enduml

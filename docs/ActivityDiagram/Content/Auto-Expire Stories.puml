@@ -1,0 +1,14 @@
+@startuml ConnectHub_Activity_AutoExpireStories
+start
+:@Scheduled job triggers every hour;
+:Calculate expiryTime = now() - 24 hours;
+:Query Content WHERE type=STORY AND timestamp < expiryTime;
+if (Expired stories found?) then (no)
+  :Nothing to delete;
+  stop
+else (yes)
+endif
+:Delete expired story records from database;
+:Log number of deleted stories;
+stop
+@enduml

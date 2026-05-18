@@ -1,0 +1,21 @@
+@startuml ConnectHub_Activity_UpdateProfile
+start
+:User edits bio, username or date of birth;
+:PUT /profile (Bearer JWT);
+if (JWT valid?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+if (New username already taken?) then (yes)
+  :Return 409 Conflict;
+  stop
+else (no)
+endif
+:Fetch User from database;
+:Apply field updates;
+:Persist updated User;
+:Return 200 OK + UserDto;
+:Profile updated in UI;
+stop
+@enduml

@@ -1,0 +1,9 @@
+@startuml ConnectHub_StateMachine_Story
+
+[*] --> Active : User creates story\n(type=STORY persisted)
+
+Active --> Expired : timestamp < now() - 24h\n(detected by @Scheduled job)
+
+Expired --> [*] : Scheduler deletes\nrecord from database
+
+@enduml

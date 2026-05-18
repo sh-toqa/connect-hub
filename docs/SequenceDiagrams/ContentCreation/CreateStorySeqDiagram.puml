@@ -1,0 +1,25 @@
+@startuml ConnectHub_Sequence_CreateStory
+actor User
+participant "React Frontend" as FE
+participant "ContentController" as CC
+participant "ContentService" as CS
+participant "StorageService" as SS
+participant "ContentRepository" as CR
+database "MySQL" as DB
+
+User -> FE: Create story (text + optional image)
+FE -> CC: POST /content/stories (Bearer JWT)
+CC -> CS: createStory(userId, request, image)
+CS -> CS: createContent(userId, text, imagePath, STORY)
+alt image present
+  CS -> SS: store(file, "stories")
+  SS --> CS: imagePath
+end
+CS -> CR: save(content)
+CR -> DB: INSERT INTO content
+DB --> CR: saved Content
+CR --> CS: Content entity
+CS --> CC: ContentDto
+CC --> FE: 201 Created + ContentDto
+FE --> User: Story appears in story strip
+@enduml

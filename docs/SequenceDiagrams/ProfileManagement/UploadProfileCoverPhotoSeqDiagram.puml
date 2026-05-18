@@ -1,0 +1,28 @@
+@startuml ConnectHub_Sequence_UploadPhoto
+actor User
+participant "React Frontend" as FE
+participant "ProfileController" as PC
+participant "ProfileService" as PS
+participant "StorageService" as SS
+participant "UserRepository" as UR
+database "MySQL" as DB
+
+User -> FE: Select and upload photo
+FE -> PC: POST /profile/photo (Bearer JWT, MultipartFile)
+PC -> PS: updateProfilePhoto(userId, file)
+PS -> UR: findById(userId)
+UR -> DB: SELECT * WHERE userId=?
+DB --> UR: User record
+UR --> PS: User entity
+PS -> SS: store(file, "profile-photos")
+SS -> SS: validateFile(type, size)
+SS --> PS: imagePath
+PS -> PS: user.setProfilePhotoPath(imagePath)
+PS -> UR: save(user)
+UR -> DB: UPDATE users SET profilePhotoPath=?
+DB --> UR: updated
+UR --> PS: User entity
+PS --> PC: UserDto
+PC --> FE: 200 OK + UserDto
+FE --> User: New photo displayed
+@enduml

@@ -1,0 +1,25 @@
+@startuml
+actor User
+participant "React Frontend" as FE
+participant "AuthController" as AC
+participant "AuthService" as AS
+participant "UserRepository" as UR
+participant "JwtUtil" as JWT
+database "MySQL" as DB
+
+User -> FE: Enter email & password
+FE -> AC: POST /auth/login
+AC -> AS: login(email, password)
+AS -> UR: findByEmail(email)
+UR -> DB: SELECT user WHERE email=?
+DB --> UR: User record
+UR --> AS: User entity
+AS -> AS: BCrypt.verify(password, hash)
+AS -> UR: updateStatus(ONLINE)
+UR -> DB: UPDATE user SET status=ONLINE
+AS -> JWT: generateToken(userId)
+JWT --> AS: signed JWT
+AS --> AC: AuthResponseDTO
+AC --> FE: 200 OK + JWT
+FE --> User: Redirect to Newsfeed
+@enduml

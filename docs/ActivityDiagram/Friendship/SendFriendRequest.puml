@@ -1,0 +1,30 @@
+@startuml ConnectHub_Activity_SendFriendRequest
+start
+:User clicks Add Friend;
+:POST /friendships/request/{receiverId} (Bearer JWT);
+if (JWT valid?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+if (Receiver exists?) then (no)
+  :Return 404 Not Found;
+  stop
+else (yes)
+endif
+if (Friendship already exists?) then (yes)
+  :Return 409 Conflict;
+  stop
+else (no)
+endif
+if (Either user blocked the other?) then (yes)
+  :Return 403 Forbidden;
+  stop
+else (no)
+endif
+:Create Friendship (status=PENDING);
+:Persist to database;
+:Return 201 Created + FriendshipDto;
+:Button changes to Pending;
+stop
+@enduml

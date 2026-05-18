@@ -1,0 +1,29 @@
+@startuml ConnectHub_Activity_UploadPhoto
+start
+:User selects profile or cover photo;
+:PUT /profile/photo (Bearer JWT, MultipartFile);
+if (JWT valid?) then (no)
+  :Return 401 Unauthorized;
+  stop
+else (yes)
+endif
+if (File type is JPEG, PNG or GIF?) then (no)
+  :Return 400 Bad Request;
+  stop
+else (yes)
+endif
+if (File size under 5MB?) then (no)
+  :Return 400 Bad Request;
+  stop
+else (yes)
+endif
+if (Old photo exists?) then (yes)
+  :Delete old photo via StorageService;
+else (no)
+endif
+:Store new photo via StorageService;
+:Update user photoPath in database;
+:Return 200 OK + UserDto;
+:New photo displayed in UI;
+stop
+@enduml
