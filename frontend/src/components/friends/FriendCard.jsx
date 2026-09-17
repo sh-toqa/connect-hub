@@ -34,7 +34,7 @@ export default function FriendCard({ friendship, onRemove, onBlock }) {
 
   return (
     <div className="friend-card">
-      <Link to={`/user/${friend?.userId}`} className="friend-card-info">
+      <Link to={`/profile/${friend?.userId}/posts`} className="friend-card-info">
         <div className="friend-card-avatar-wrap" style={{ position: 'relative' }}>
           <div className="friend-card-avatar">
             {avatarSrc

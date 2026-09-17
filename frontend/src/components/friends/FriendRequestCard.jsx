@@ -10,7 +10,7 @@ export default function FriendRequestCard({ request, onAccept, onDecline }) {
 
   return (
     <div className="friend-card">
-      <Link to={`/user/${requester?.userId}`} className="friend-card-info">
+      <Link to={`/profile/${requester?.userId}/posts`} className="friend-card-info">
         <div className="friend-card-avatar">
           {avatarSrc
             ? <img src={avatarSrc} alt={requester?.username} />

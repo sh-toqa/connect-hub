@@ -16,7 +16,7 @@ export default function SuggestionCard({ user, onSend }) {
 
   return (
     <div className="friend-card">
-      <Link to={`/user/${user?.userId}`} className="friend-card-info">
+      <Link to={`/profile/${user?.userId}/posts`} className="friend-card-info">
         <div className="friend-card-avatar">
           {avatarSrc
             ? <img src={avatarSrc} alt={user?.username} />

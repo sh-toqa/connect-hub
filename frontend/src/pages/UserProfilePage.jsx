@@ -87,9 +87,10 @@ export default function UserProfilePage() {
   return (
     <main className="profile-page">
 
-      {/* Cover photo */}
+      {/* Cover photo - read-only, this is not the logged-in user's profile */}
       <CoverPhoto
         src={profile?.coverPhotoPath}
+        editable={false}
       />
 
       {/* Profile header */}
@@ -98,6 +99,7 @@ export default function UserProfilePage() {
         <ProfileAvatar
           src={profile?.profilePhotoPath}
           username={profile?.username}
+          editable={false}
         />
 
         <div className="profile-info">

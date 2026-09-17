@@ -50,7 +50,7 @@ export default function NewsfeedRightSidebar() {
               return (
                 <Link
                   key={f.friendshipId}
-                  to={`/user/${friend?.userId}`}
+                  to={`/profile/${friend?.userId}/posts`}
                   className="sidebar-friend-item"
                 >
                   <div className="sidebar-friend-avatar-wrap">
@@ -89,7 +89,7 @@ export default function NewsfeedRightSidebar() {
 
             return (
               <div key={user.userId} className="sidebar-suggestion-item">
-                <Link to={`/user/${user.userId}`} className="sidebar-suggestion-info">
+                <Link to={`/profile/${user.userId}/posts`} className="sidebar-suggestion-info">
                   <div className="sidebar-friend-avatar">
                     {avatarSrc
                       ? <img src={avatarSrc} alt={user.username} />
