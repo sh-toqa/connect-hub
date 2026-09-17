@@ -210,23 +210,36 @@ cd connecthub/backend
 # 2. Create the database
 mysql -u root -p -e "CREATE DATABASE connecthub CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# 3. Configure application.properties
-# Edit src/main/resources/application.properties:
-# spring.datasource.url=jdbc:mysql://localhost:3306/connecthub?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-# spring.datasource.username=${SQL_USERNAME}
-# spring.datasource.password=${SQL_PASSWORD}
-# app.jwt.secret=MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI=
+# 3. Configure environment variables
+# If backend/.env does NOT already exist, create it from the template
+# (it's gitignored, so nothing here ever gets committed):
+[ -f .env ] || cp .env.example .env
+# If APP_JWT_SECRET in .env is empty, generate a strong one and paste it in:
+openssl rand -base64 64
+# Fill in SQL_USERNAME / SQL_PASSWORD with your real local MySQL credentials.
+# NEVER re-run `cp .env.example .env` once .env has real values in it -
+# that will silently overwrite them with the empty placeholders.
 
-# 4. Run
-mvn spring-boot:run
+# 4. Load the env vars and run with the dev profile active
+set -a && source .env && set +a && mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# (or paste the contents of .env into your IDE's run configuration
+# environment variables field, and set the active profile to "dev")
 
 # API runs at http://localhost:8080
 ```
+
+All backend config (DB host/port/name, JWT secret, CORS origin, upload
+dir, server port) is environment-driven - see `backend/.env.example` for
+the full list. Nothing sensitive lives in `application.properties`.
 
 ### Frontend setup
 
 ```bash
 cd connecthub/frontend
+
+cp .env.example .env
+# Edit .env and set VITE_API_BASE_URL to your backend's URL
+# (defaults to http://localhost:8080 for local dev)
 
 npm install
 npm run dev
@@ -236,7 +249,7 @@ npm run dev
 
 ### Development data (optional)
 
-Add `spring.profiles.active=dev` to `application.properties` and set `spring.jpa.hibernate.ddl-auto=create-drop` to seed the database with 8 users, 35 posts, 9 stories, and 12 friendships on every restart.
+Running with the `dev` profile active (see step 4 above) seeds the database with 8 users, 35 posts, 9 stories, and 12 friendships on every restart - `application-dev.properties` already sets `spring.jpa.hibernate.ddl-auto=create-drop`, and `DataSeeder` runs automatically whenever `dev` is active.
 
 Default credentials for all seeded users: `password123`
 
