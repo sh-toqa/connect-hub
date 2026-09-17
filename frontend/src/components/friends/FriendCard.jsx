@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link }     from 'react-router-dom';
 import { useAuth }  from '../../context/AuthContext';
+import { API_BASE_URL } from '../../config/api';
 
 /**
  * Receives a FriendshipDto — { friendshipId, requester, receiver, status }
@@ -16,7 +17,7 @@ export default function FriendCard({ friendship, onRemove, onBlock }) {
     : friendship.requester;
 
   const avatarSrc = friend?.profilePhotoPath
-    ? `http://localhost:8080${friend.profilePhotoPath}`
+    ? `${API_BASE_URL}${friend.profilePhotoPath}`
     : null;
   const initials  = friend?.username?.slice(0, 2).toUpperCase() || '??';
   const isOnline  = friend?.status === 'ONLINE';

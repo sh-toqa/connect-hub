@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { API_BASE_URL } from '../../config/api';
 
 /**
  * Circular profile photo with hover-to-upload overlay.
@@ -31,7 +32,7 @@ export default function ProfileAvatar({ src, username, onUpload, editable = true
     }
   };
 
-  const displaySrc = preview || (src ? `http://localhost:8080${src}` : null);
+  const displaySrc = preview || (src ? `${API_BASE_URL}${src}` : null);
   const initials   = username ? username.slice(0, 2).toUpperCase() : '??';
 
   return (

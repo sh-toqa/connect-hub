@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../../config/api';
 
 export default function SuggestionCard({ user, onSend }) {
   const [sent, setSent] = useState(false);
   const avatarSrc = user?.profilePhotoPath
-    ? `http://localhost:8080${user.profilePhotoPath}`
+    ? `${API_BASE_URL}${user.profilePhotoPath}`
     : null;
   const initials = user?.username?.slice(0, 2).toUpperCase() || '??';
 

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api';
 /**
  * Displays the user's friends list with online/offline status dots.
  * Used on the profile page right sidebar.
@@ -11,7 +12,7 @@ export default function FriendsList({ friends }) {
     <ul className="friends-list" aria-label="Friends list">
       {friends.map(friend => {
         const avatarSrc = friend.profilePhotoPath
-          ? `http://localhost:8080${friend.profilePhotoPath}`
+          ? `${API_BASE_URL}${friend.profilePhotoPath}`
           : null;
         const initials = friend.username?.slice(0, 2).toUpperCase() || '??';
         const isOnline  = friend.status === 'ONLINE';

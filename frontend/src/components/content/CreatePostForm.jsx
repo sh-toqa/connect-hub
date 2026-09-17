@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE_URL } from '../../config/api';
 
 /**
  * Compose area on the newsfeed.
@@ -18,7 +19,7 @@ export default function CreatePostForm({ onSubmitPost, onSubmitStory }) {
   const fileRef = useRef(null);
 
   const avatarSrc = user?.profilePhotoPath
-    ? `http://localhost:8080${user.profilePhotoPath}`
+    ? `${API_BASE_URL}${user.profilePhotoPath}`
     : null;
   const initials = user?.username?.slice(0, 2).toUpperCase() || '??';
 

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link }      from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE_URL } from '../../config/api';
 
 // Modal to view a post or story in detail, with delete option for owner.
 export default function ContentModal({ content, onClose, onDelete }) {
@@ -18,7 +19,7 @@ export default function ContentModal({ content, onClose, onDelete }) {
   const { contentId, contentText, imagePath, contentType, timestamp, author } = content;
 
   const avatarSrc = author?.profilePhotoPath
-    ? `http://localhost:8080${author.profilePhotoPath}`
+    ? `${API_BASE_URL}${author.profilePhotoPath}`
     : null;
   const initials    = author?.username?.slice(0, 2).toUpperCase() || '??';
   const isOwner      = user?.userId === author?.userId;
@@ -84,7 +85,7 @@ export default function ContentModal({ content, onClose, onDelete }) {
         {imagePath && (
           <div className="content-modal-image">
             <img
-              src={`http://localhost:8080${imagePath}`}
+              src={`${API_BASE_URL}${imagePath}`}
               alt="Content"
             />
           </div>

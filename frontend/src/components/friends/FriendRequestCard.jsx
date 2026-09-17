@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
+import { API_BASE_URL } from '../../config/api';
 
 export default function FriendRequestCard({ request, onAccept, onDecline }) {
   const { friendshipId, requester } = request;
   const avatarSrc = requester?.profilePhotoPath
-    ? `http://localhost:8080${requester.profilePhotoPath}`
+    ? `${API_BASE_URL}${requester.profilePhotoPath}`
     : null;
   const initials = requester?.username?.slice(0, 2).toUpperCase() || '??';
 

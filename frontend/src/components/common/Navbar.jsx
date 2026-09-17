@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE_URL } from '../../config/api';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -11,14 +12,14 @@ export default function Navbar() {
   };
 
   const avatarSrc = user?.profilePhotoPath
-    ? `http://localhost:8080${user.profilePhotoPath}`
+    ? `${API_BASE_URL}${user.profilePhotoPath}`
     : null;
   const initials = user?.username?.slice(0, 2).toUpperCase() || '??';
 
   return (
     <nav className="navbar" role="navigation" aria-label="Main navigation">
       <NavLink to="/" className="navbar-brand">
-        <span className="brand-icon"></span>
+        <span className="brand-icon" aria-hidden="true">C</span>
         ConnectHub
       </NavLink>
 

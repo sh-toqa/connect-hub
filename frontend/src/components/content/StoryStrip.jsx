@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api';
 export default function StoryStrip({ stories, onStoryClick }) {
   if (!stories || stories.length === 0) return null;
 
@@ -14,7 +15,7 @@ export default function StoryStrip({ stories, onStoryClick }) {
       <div className="story-strip-scroll">
         {byAuthor.map(story => {
           const avatarSrc = story.author.profilePhotoPath
-            ? `http://localhost:8080${story.author.profilePhotoPath}`
+            ? `${API_BASE_URL}${story.author.profilePhotoPath}`
             : null;
           const initials = story.author.username?.slice(0, 2).toUpperCase() || '??';
 

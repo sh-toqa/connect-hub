@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link }                from 'react-router-dom';
 import { getFriends, getSuggestions, sendRequest } from '../../api/friendApi';
 import { useAuth }             from '../../context/AuthContext';
+import { API_BASE_URL } from '../../config/api';
 
 export default function NewsfeedRightSidebar() {
   const { user: currentUser } = useAuth();
@@ -42,7 +43,7 @@ export default function NewsfeedRightSidebar() {
                 : f.requester;
               const isOnline = friend?.status === 'ONLINE';
               const avatarSrc = friend?.profilePhotoPath
-                ? `http://localhost:8080${friend.profilePhotoPath}`
+                ? `${API_BASE_URL}${friend.profilePhotoPath}`
                 : null;
               const initials = friend?.username?.slice(0, 2).toUpperCase() || '??';
 
@@ -82,7 +83,7 @@ export default function NewsfeedRightSidebar() {
           </h3>
           {suggestions.map(user => {
             const avatarSrc = user?.profilePhotoPath
-              ? `http://localhost:8080${user.profilePhotoPath}`
+              ? `${API_BASE_URL}${user.profilePhotoPath}`
               : null;
             const initials = user?.username?.slice(0, 2).toUpperCase() || '??';
 

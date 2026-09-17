@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { API_BASE_URL } from '../../config/api';
 
 /**
  * Displays the cover photo with an overlay upload button.
@@ -38,7 +39,7 @@ export default function CoverPhoto({ src, onUpload, editable = true }) {
     }
   };
 
-  const displaySrc = preview || (src ? `http://localhost:8080${src}` : null);
+  const displaySrc = preview || (src ? `${API_BASE_URL}${src}` : null);
 
   return (
     <div className="cover-photo-container">
