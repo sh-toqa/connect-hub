@@ -199,6 +199,7 @@ connecthub/
 - Node.js 22+
 - MySQL 9+
 - Maven 3.9+
+- Docker (optional, for running the backend in a container)
 
 ### Backend setup
 
@@ -231,6 +232,37 @@ set -a && source .env && set +a && mvn spring-boot:run -Dspring-boot.run.profile
 All backend config (DB host/port/name, JWT secret, CORS origin, upload
 dir, server port) is environment-driven - see `backend/.env.example` for
 the full list. Nothing sensitive lives in `application.properties`.
+
+### Running the backend with Docker (optional)
+
+An alternative to the manual Maven setup above - useful for verifying the
+app runs the same way it will in production, or if you don't want Maven/JDK
+17 installed locally.
+
+```bash
+cd connecthub/backend
+
+docker build -t connecthub-backend:local .
+
+docker run -d \
+  --name connecthub-backend \
+  -p 8080:8080 \
+  --env-file .env \
+  -e DB_HOST=host.docker.internal \
+  -e SPRING_PROFILES_ACTIVE=dev \
+  connecthub-backend:local
+
+# API runs at http://localhost:8080
+```
+
+`DB_HOST=host.docker.internal` overrides the `.env` value on purpose: inside
+a container, `localhost` refers to the container itself, not your Mac where
+MySQL is actually running. `host.docker.internal` is Docker Desktop's name
+for "the host machine."
+
+Note: uploaded files (profile/cover photos) are written inside the
+container's own filesystem and are lost if the container is removed - see
+the `app.upload-dir` note in `application.properties` for why.
 
 ### Frontend setup
 
