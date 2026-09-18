@@ -89,6 +89,18 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Flyway: manages the production database schema via versioned
+             migrations in src/main/resources/db/migration. Only enabled for
+             the prod profile - see application.properties. -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+        </dependency>
+
         <!-- H2 Database: A fast, in-memory database used only for running tests -->
         <dependency>
             <groupId>com.h2database</groupId>
