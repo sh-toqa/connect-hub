@@ -30,6 +30,15 @@ new account to try the signup flow yourself.
 > runs on a free hosting tier that spins down when idle. That's a
 > hosting-tier tradeoff, not a bug — see [Deployment](#deployment) below.
 
+### Screenshots
+
+| Feed | Friends |
+|---|---|
+| ![Feed](docs/images/home.png) | ![Friends](docs/images/friends.png) |
+
+**Profile**
+![Profile](docs/images/profile.png)
+
 ---
 
 ## Features
