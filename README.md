@@ -13,6 +13,25 @@ with React, file storage with MySQL, and adding a REST API layer with JWT authen
 
 ---
 
+## Live Demo
+
+**App:** https://connect-hub-three-sepia.vercel.app
+**API:** https://connect-hub-production-9c68.up.railway.app
+
+| Demo account | Password |
+|---|---|
+| `demo@connecthub.dev` | `password123` |
+
+Logging in as `demo` shows an account with existing friends, a pending
+friend request, a blocked user, and a small post history — or register a
+new account to try the signup flow yourself.
+
+> First request after a period of inactivity can take ~30–60s: the backend
+> runs on a free hosting tier that spins down when idle. That's a
+> hosting-tier tradeoff, not a bug — see [Deployment](#deployment) below.
+
+---
+
 ## Features
 
 - **User Authentication** — JWT-based register, login, logout with BCrypt password hashing
@@ -35,9 +54,11 @@ with React, file storage with MySQL, and adding a REST API layer with JWT authen
 | Spring Security + JWT | Authentication & authorization |
 | Spring Data JPA + Hibernate | ORM and database access |
 | MySQL | Primary database |
+| Flyway | Versioned production schema migrations |
 | H2 (in-memory) | Test database |
 | BCrypt | Password hashing |
 | Maven | Build tool |
+| Docker | Multi-stage, non-root container image |
 
 ### Frontend
 | Technology | Purpose |
@@ -91,6 +112,16 @@ Each layer has a single responsibility. Controllers handle HTTP, services contai
 
 ---
 
+## Security
+
+- **Authentication** — stateless JWT (HS512), issued on login/register, validated on every protected request by a custom `JwtAuthFilter`
+- **Passwords** — BCrypt, strength 10, never logged or included in any response DTO
+- **CORS** — restricted to a single, explicitly configured frontend origin (`app.cors.allowed-origin`), not wildcarded
+- **Secrets** — the JWT signing key and database credentials are never hardcoded or committed. Every environment (dev/test/prod) resolves them from environment variables, and production has **no default value** for the JWT secret — a missing secret fails startup instead of silently signing tokens with a weak key
+- **Transport** — HTTPS end-to-end in production (provided automatically by Vercel and Railway); the database connection itself requires TLS (`sslMode=REQUIRED`)
+
+---
+
 ## Project Structure
 
 ```
@@ -105,7 +136,7 @@ connecthub/
 │   │   │                      StorageService (interface), LocalStorageService
 │   │   ├── repository/        UserRepository, ContentRepository, FriendshipRepository
 │   │   ├── model/             User, Content, Friendship
-│   │   ├── enums/             ContentType, FriendshipStatus, OnlineStatus
+│   │   ├── enums/             ContentType, FriendshipStatus, UserStatus
 │   │   ├── dto/
 │   │   │   ├── request/       RegisterRequest, LoginRequest, UpdateProfileRequest ...
 │   │   │   └── response/      UserDto, ContentDto, FriendshipDto, LoginResponse ...
@@ -287,6 +318,36 @@ Default credentials for all seeded users: `password123`
 
 ---
 
+## Deployment
+
+See [Live Demo](#live-demo) above for the actual links and demo credentials.
+This section covers how it's deployed, not how to run it locally.
+
+| Layer | Platform | Why |
+|---|---|---|
+| Frontend | Vercel | Static Vite build, automatic HTTPS, zero-config SPA hosting |
+| Backend | Railway | Builds and runs directly from the repo's `Dockerfile` — the same image tested locally, not a separately-guessed build process |
+| Database | Aiven | Managed MySQL, free tier with no time limit, kept on its own platform so the data outlives either app host |
+
+### Production schema management
+
+Production runs the `prod` Spring profile, which flips two things relative to local dev:
+
+- `spring.jpa.hibernate.ddl-auto=validate` — Hibernate only checks the schema matches the entities; it never creates or alters tables in production
+- **Flyway** owns schema creation instead. Versioned migrations in `backend/src/main/resources/db/migration/` run automatically on startup, before Hibernate initializes:
+  - `V1__init_schema.sql` — creates the schema
+  - `V2__demo_data.sql` — seeds the demo account and its data
+  
+  Each migration runs exactly once (tracked in `flyway_schema_history`), so redeploys never re-run them or duplicate data.
+
+All database credentials, the JWT secret, and the CORS-allowed origin are injected as platform environment variables at runtime — never present in any committed file.
+
+### Known limitation
+
+Uploaded files (profile/cover photos) are stored on the backend container's local filesystem, which is wiped on every redeploy. This is a deliberate scope decision for a first deployment, not an oversight — `StorageService` already abstracts storage behind an interface specifically so it can be swapped for S3-compatible storage later without touching any calling code.
+
+---
+
 ## Running Tests
 
 ```bash
@@ -315,6 +376,16 @@ npm test
 
 ---
 
+## Notable Technical Decisions
+
+- **Spring profiles (dev/test/prod) instead of one shared config** — each environment has genuinely different needs (disposable, reseedable data locally vs. a durable schema in production), so they're separated at the configuration level rather than branched on inside application code.
+- **Flyway only in production** — `dev`/`test` use Hibernate's `create-drop` for fast local iteration; introducing Flyway there too would fight that on every restart for no benefit. Migrations are reserved for the one environment where schema stability actually matters.
+- **Multi-stage, non-root Docker build** — the build stage (Maven + JDK) never ships. The runtime image contains only a JRE and the compiled JAR, and runs as an unprivileged user rather than root.
+- **`StorageService` as an interface, not a concrete class** — local disk storage is a reasonable choice at this stage, but every call site depends on the interface, so moving to S3-compatible storage later is a one-class addition, not a rewrite.
+- **No comment feature** — scope was kept to friendships, posts, stories, and blocking, implemented fully, rather than spreading effort thinner across a longer feature list.
+
+---
+
 ## SDLC Followed
 
 This project was developed following the full Software Development Lifecycle:
@@ -334,7 +405,7 @@ This project was developed following the full Software Development Lifecycle:
 - **Cloud storage** — Swap `LocalStorageService` for `S3StorageService` (interface already in place)
 - **OAuth login** — Google/GitHub sign-in
 - **Mobile app** — React Native client consuming the same REST API
-- **Containerization** — Docker Compose setup for one-command local deployment
+- **Docker Compose** — bundle the backend with a MySQL container for one-command local setup (currently the Docker image packages the backend only; MySQL is expected to already be running)
 - **Admin dashboard** — Content moderation, user management
 
 ---
