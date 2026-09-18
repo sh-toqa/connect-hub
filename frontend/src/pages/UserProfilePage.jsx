@@ -169,7 +169,7 @@ export default function UserProfilePage() {
               className="btn-secondary"
               disabled
             >
-              ⏳ Request Sent
+              ⏳ Request Pending
             </button>
           )}
 

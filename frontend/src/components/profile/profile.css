@@ -356,6 +356,15 @@
   border-radius: var(--radius);
 }
 .upload-preview--cover img { width: 100%; height: 100%; object-fit: cover; }
+.upload-preview--placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--gray-200);
+  font-size: 24px; font-weight: 700; color: var(--gray-500);
+}
+.upload-preview--placeholder-cover {
+  background: linear-gradient(135deg, #1877f2 0%, #42b72a 100%);
+}
 .upload-overlay-btn {
   position: absolute;
   inset: 0;

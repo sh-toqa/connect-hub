@@ -3,6 +3,7 @@
 // FR-PM-10: local image preview before upload
 
 import { useState, useRef } from 'react';
+import { API_BASE_URL } from '../../config/api';
 
 const TABS = ['Profile', 'Cover Photo', 'Password'];
 
@@ -24,6 +25,10 @@ export default function EditProfileModal({ profile, onSaveBio, onSaveProfilePhot
 
   const profileInputRef = useRef();
   const coverInputRef   = useRef();
+
+  const initials = profile?.username ? profile.username.slice(0, 2).toUpperCase() : '??';
+  const profilePhotoSrc = photoPreview || (profile?.profilePhotoPath ? `${API_BASE_URL}${profile.profilePhotoPath}` : null);
+  const coverPhotoSrc   = coverPreview || (profile?.coverPhotoPath ? `${API_BASE_URL}${profile.coverPhotoPath}` : null);
 
   const clearMessages = () => { setSuccessMsg(''); setServerError(''); };
 
@@ -120,10 +125,9 @@ export default function EditProfileModal({ profile, onSaveBio, onSaveProfilePhot
             {/* Profile photo upload with preview — FR-PM-10 */}
             <div className="upload-row">
               <div className="upload-preview upload-preview--round">
-                <img
-                  src={photoPreview || profile?.profilePhotoPath || 'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original'}
-                  alt="Profile photo preview"
-                />
+                {profilePhotoSrc
+                  ? <img src={profilePhotoSrc} alt="Profile photo preview" />
+                  : <div className="upload-preview--placeholder">{initials}</div>}
                 <button
                   className="upload-overlay-btn"
                   onClick={() => profileInputRef.current?.click()}
@@ -174,11 +178,9 @@ export default function EditProfileModal({ profile, onSaveBio, onSaveProfilePhot
           <div className="modal__body">
             {/* Cover preview — FR-PM-10 */}
             <div className="upload-preview upload-preview--cover">
-              <img
-                src={coverPreview || profile?.coverPhotoPath ||
-                  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=60'}
-                alt="Cover photo preview"
-              />
+              {coverPhotoSrc
+                ? <img src={coverPhotoSrc} alt="Cover photo preview" />
+                : <div className="upload-preview--placeholder upload-preview--placeholder-cover" />}
               <button
                 className="upload-overlay-btn upload-overlay-btn--cover"
                 onClick={() => coverInputRef.current?.click()}
