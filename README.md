@@ -153,6 +153,9 @@ connecthub/
 │   │   ├── security/          SecurityConfig, JwtUtil, JwtAuthFilter
 │   │   ├── exception/         GlobalExceptionHandler, ResourceNotFoundException ...
 │   │   └── config/            WebMvcConfig, DataSeeder
+│   ├── src/main/resources/
+│   │   ├── application*.properties   base + dev/prod profile overrides
+│   │   └── db/migration/             Flyway migrations (prod schema + demo data)
 │   └── src/test/java/
 │       ├── Unit/
 │       │   ├── service/       ProfileServiceTest, ContentServiceTest,
@@ -172,7 +175,8 @@ connecthub/
         │                      FriendsPage, UserProfilePage, NotFoundPage
         ├── styles/            global.css
         └── components/
-            ├── common/        Navbar, AuthLayout, ProtectedRoute, GuestRoute
+            ├── common/        Navbar, AuthLayout
+            │                  (route guards - PrivateRoutes/PublicRoutes - live in App.jsx)
             ├── profile/       ProfileAvatar, CoverPhoto, PostCard,
             │                  FriendsList, EditProfileModal
             ├── content/       CreatePostForm, StoryStrip, ContentModal,

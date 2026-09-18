@@ -41,7 +41,6 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity<UserDto> getMyProfile(
             @AuthenticationPrincipal UserDetails userDetails) {
-        System.out.println("Authenticated user: " + userDetails.getUsername());
         UUID userId = extractUserId(userDetails);
         return ResponseEntity.ok(profileService.getProfile(userId));
     }

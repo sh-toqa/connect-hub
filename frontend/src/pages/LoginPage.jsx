@@ -11,8 +11,8 @@ export default function LoginPage() {
     setServerError('');
     try {
       await login(credentials);
-      // No navigate() here — GuestRoute detects user is now set
-      // and redirects to /feed automatically
+      // No navigate() here — PublicRoutes (in App.jsx) detects user is now
+      // set and redirects to /feed automatically
     } catch {
       setServerError('Invalid email or password. Please try again.');
     }

@@ -14,9 +14,6 @@ export function AuthProvider({ children }) {
   const login = useCallback(async ({ email, password }) => {
     const { data } = await loginApi({ email, password });
 
-    // Log the raw response so we can see the exact shape
-    console.log('Raw login response:', data);
-
     // Handle both response shapes:
     const token = data.token;
     const user  = data.user ?? {
@@ -28,8 +25,6 @@ export function AuthProvider({ children }) {
       coverPhotoPath:  data.coverPhotoPath,
       status:          data.status,
     };
-
-    console.log('Parsed user:', user);
 
     sessionStorage.setItem('token', token);
     sessionStorage.setItem('user', JSON.stringify(user));

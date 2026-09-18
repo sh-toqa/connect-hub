@@ -23,7 +23,6 @@ export default function ProfilePage() {
   } = useProfile();
   const [showModal,       setShowModal]       = useState(false);
   const [selectedContent, setSelectedContent] = useState(null);
-  console.log("stories:", stories);
 
   if (loading) {
     return (

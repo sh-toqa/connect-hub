@@ -47,7 +47,6 @@ public class ProfileService {
     // View own or another user's profile
     public UserDto getProfile(UUID userId) {
         User user = findUserOrThrow(userId);
-        System.out.println("Fetched user: " + user.getEmail());
         return userMapper.toUserDto(user);
     }
 
