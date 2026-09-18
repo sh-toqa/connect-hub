@@ -396,6 +396,25 @@ This project was developed following the full Software Development Lifecycle:
 4. **Testing** — Unit tests, integration tests, and system tests covering the complete backend; frontend unit tests with Vitest
 5. **Maintenance** — Documented future improvements and scalability paths
 
+### Design diagrams
+
+A sample of the UML diagrams from the design phase above — the full set (activity diagrams, state machines, and sequence diagrams for every flow) is in [`docs/`](docs/) as PlantUML source.
+
+**Class Diagram**
+![Class Diagram](docs/images/class-diagram.svg)
+
+**Use Case Diagram**
+![Use Case Diagram](docs/images/use-case-diagram.svg)
+
+**Login — Sequence Diagram**
+![Login Sequence Diagram](docs/images/sequence-login.svg)
+
+**Send Friend Request — Sequence Diagram**
+![Send Friend Request Sequence Diagram](docs/images/sequence-send-friend-request.svg)
+
+**Create Post — Sequence Diagram**
+![Create Post Sequence Diagram](docs/images/sequence-create-post.svg)
+
 ---
 
 ## Future Improvements
