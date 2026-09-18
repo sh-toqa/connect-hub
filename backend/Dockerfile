@@ -10,7 +10,14 @@ RUN mvn package -DskipTests -B
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 
+RUN useradd -u 1001 appuser
+
 COPY --from=build /app/target/backend-0.0.1-SNAPSHOT.jar app.jar
+
+# appuser needs to own /app so it can both read app.jar and create the
+# uploads/ directory LocalStorageService writes to at runtime.
+RUN mkdir -p /app/uploads && chown -R appuser:appuser /app
+USER appuser
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
