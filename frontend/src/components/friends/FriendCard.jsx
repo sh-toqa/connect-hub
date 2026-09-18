@@ -49,7 +49,6 @@ export default function FriendCard({ friendship, onRemove, onBlock }) {
         </div>
         <div>
           <p className="friend-card-name">{friend?.username}</p>
-          <p className="friend-card-sub">{isOnline ? '🟢 Online' : '⚫ Offline'}</p>
         </div>
       </Link>
 
